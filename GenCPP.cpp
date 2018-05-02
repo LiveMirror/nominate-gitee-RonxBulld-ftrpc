@@ -210,7 +210,9 @@ bool GenerateCPP_Caller(struct RootNode &document, class lex *lexer)
             FunctionWithCallBack.append(FunctionParams);
             FunctionWithCallBack.append("\tret[\"params\"] = params;\n"
                                         "\tret[\"version\"] = FTRPC_VERSION_MAJOR;\n"
+                                        "\tscmapMutex.lock();\n"
                                         "\tserialCallbackMap[serial] = (void*)_callback;\n"
+                                        "\tscmapMutex.unlock();\n"
                                         "\tRETURN;\n"
                                         "}\n\n");
             fprintf(pCallerHeaderFile, "void(*_callback)(%s));\n", GetCppType(api->retType.type).c_str());
@@ -232,7 +234,6 @@ bool GenerateCPP_Caller(struct RootNode &document, class lex *lexer)
 bool GenerateCPP(struct RootNode &document, class lex *lexer)
 {
     GenerateCPP_Provider(document, lexer);
-    GenerateCPP_Caller(document, lexer);
     GenerateCPP_Caller(document, lexer);
     return true;
 }

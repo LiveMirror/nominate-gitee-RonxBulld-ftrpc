@@ -25,7 +25,7 @@ const token EOF_Token { TOKEN_EOF, nullptr, 0, 0 };
 
 lex::lex(const char *src)
 {
-    this->src = _strdup(src);
+    this->src = strdup(src);
     this->maxptr = strlen(this->src);
 #define TYPE(k)    this->keywdMap[#k] = TOKEN_##k;
 #define KEYWD(k)    this->keywdMap[#k] = TOKEN_##k;

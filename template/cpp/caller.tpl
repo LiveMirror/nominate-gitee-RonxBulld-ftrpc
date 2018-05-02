@@ -3,6 +3,7 @@
 #include <map>
 #include <sstream>
 #include <memory>
+#include <mutex>
 #include "ftrpc.caller.h"
 #include "json/json.h"
 #include "TypeDef.h"
@@ -20,6 +21,7 @@ unsigned int GlobalSerialIndex = 0;
                                       jv["funcName"] = FuncName; } while(0)
 
 std::map<unsigned int, void *> serialCallbackMap;
+std::mutex scmapMutex;
 
 // @#{Non-blocking RPC with callback}@#
 #ifdef PROVIDER_DEMO_INSIDE
@@ -32,7 +34,9 @@ std::string Test::request(std::string req, void(*_callback)(void))
     params[0] = req;
     ret["params"] = params;
     ret["version"] = FTRPC_VERSION_MAJOR;
+    scmapMutex.lock();
     serialCallbackMap[serial] = (void*)_callback;
+    scmapMutex.unlock();
     RETURN;
 }
 #endif
@@ -54,8 +58,10 @@ bool ReturnRecived(std::string JSON)
             return false;
         }
         unsigned int serial = root["serial"].asUInt();
+        scmapMutex.lock();
         void *cbfptr = serialCallbackMap[serial];
         serialCallbackMap.erase(serial);
+        scmapMutex.unlock();
         if (!root["success"].asBool())
             return false;
         switch (root["return"].type())

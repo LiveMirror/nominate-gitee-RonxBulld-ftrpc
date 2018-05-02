@@ -1,16 +1,19 @@
 cmake_minimum_required(VERSION 3.5)
 project(ftrpc)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS -std=c++17)
 
 IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
     ADD_CUSTOM_COMMAND(OUTPUT copy_res
-            COMMAND xcopy ..\\template .\\template /e/h/y/i
+            COMMAND xcopy $(CMAKE_SOURCE_DIR)\\template .\\template /e/h/y/i
+            COMMAND copy $(CMAKE_SOURCE_DIR)\\License.txt .\\License.txt
             )
     add_custom_target(CopyTask ALL DEPENDS copy_res)
 ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
     ADD_CUSTOM_COMMAND(OUTPUT copy_res
-            COMMAND cp -a ../*.tpl ./*.tpl
+            COMMAND cp -a $(CMAKE_SOURCE_DIR)/template ./template
+            COMMAND cp $(CMAKE_SOURCE_DIR)/License.txt ./License.txt
             )
     add_custom_target(CopyTask ALL DEPENDS copy_res)
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "Windows")

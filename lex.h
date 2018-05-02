@@ -51,8 +51,10 @@ public:
         this->msg = msg;
         this->what();
     }
-    const char* what() noexcept {
+    const char* what() {
         std::cerr << this->msg << std::endl;
+    }
+    ~LexException() throw() {
     }
 };
 
