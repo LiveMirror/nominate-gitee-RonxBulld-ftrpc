@@ -5,12 +5,12 @@ set(CMAKE_CXX_STANDARD 14)
 
 IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
     ADD_CUSTOM_COMMAND(OUTPUT copy_res
-            COMMAND copy ..\\*.tpl .\\*.tpl
+            COMMAND xcopy ..\\template .\\template /e/h/y/i
             )
     add_custom_target(CopyTask ALL DEPENDS copy_res)
 ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
     ADD_CUSTOM_COMMAND(OUTPUT copy_res
-            COMMAND copy ../*.tpl ./*.tpl
+            COMMAND cp -a ../*.tpl ./*.tpl
             )
     add_custom_target(CopyTask ALL DEPENDS copy_res)
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "Windows")

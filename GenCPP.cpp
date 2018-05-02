@@ -9,6 +9,9 @@
 #include <exception>
 #include "GenCPP.h"
 
+#define PROVIDER_TPL_FILE "./template/cpp/provider.tpl"
+#define CALLER_TPL_FILE "./template/cpp/caller.tpl"
+
 std::map<enum Type, std::tuple<std::string, std::string, std::string>> typeMap = {
         {TY_string, {"std::string", "asString", "TY_string"}},
         {TY_void,   {"void",        "",         "TY_void"}},
@@ -102,7 +105,7 @@ bool GenerateCPP_Provider(struct RootNode &document, class lex *lexer)
     fprintf(pProviderHeaderFile, "\n#include <string>\n\n"
                                  "std::string ProviderDoCall(const std::string &JSON);\n\n");
     FILE *pProviderSrcFile = fopen(src_file_name, "w+");
-    std::string ProviderTplFile = ReadFileAsTxt("provider.tpl");
+    std::string ProviderTplFile = ReadFileAsTxt(PROVIDER_TPL_FILE);
     std::string FunctionMicro, FunctionSignature, FunctionCheckAndCall;
     // Module
     for(auto module : document.modules) {
@@ -171,7 +174,7 @@ bool GenerateCPP_Caller(struct RootNode &document, class lex *lexer)
     fprintf(pCallerHeaderFile, "\n#include <string>\n\n");
 
     FILE *pCallerSrcFile = fopen(src_file_name, "w+");
-    std::string CallerTplFile = ReadFileAsTxt("caller.tpl");
+    std::string CallerTplFile = ReadFileAsTxt(CALLER_TPL_FILE);
 
     std::string FunctionWithCallBack;
 
