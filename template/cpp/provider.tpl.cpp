@@ -17,7 +17,7 @@
                        RETURN; }while(0)
 #define CHECK_PARAM_COUNT(PARAM_COUNT) do{ if(paramCount != (PARAM_COUNT)) \
                                            FAILED("The number of parameters is incorrect."); }while(0)
-#define CHECK_PARAM_SIGNATURE(Module, Function) do{ if(paramentSignature == FunctionSignatureDictionary[FUNCTION_##Module##_##Function]) \
+#define CHECK_PARAM_SIGNATURE(Module, Function) do{ if(paramentSignature != FunctionSignatureDictionary[FUNCTION_##Module##_##Function]) \
                                                     FAILED("The parameter type signature is inconsistent with the definition."); }while(0)
 
 constexpr unsigned long long int HashStringToInt(const char *str, unsigned long long int hash = 0)

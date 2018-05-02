@@ -84,7 +84,8 @@ bool GenerateCPP_Provider(struct RootNode &document, class lex *lexer)
             FunctionMicro.append("#define FUNCTION_").append(CurModuleName).append("_").append(ApiName).append(" ").append(std::to_string(apiIndex++)).append(1,'\n');
             FunctionSignature.append("\t{ FUNCTION_").append(CurModuleName).append("_").append(ApiName).append(", std::string({");
             FunctionCheckAndCall.append("\t\t\tcase HashStringToInt(\"").append(FullApiName).append("\"): {\n\t\t\t\t");
-            FunctionCheckAndCall.append("CHECK_PARAM_COUNT(6);\n""\t\t\t\tCHECK_PARAM_SIGNATURE(").append(CurModuleName).append(", ").append(ApiName).append(");\n\t\t\t\tJson::Value param = root[\"params\"];\n\t\t\t\t");
+            FunctionCheckAndCall.append("CHECK_PARAM_COUNT(").append(std::to_string(api->params.size())).append(");\n");
+            FunctionCheckAndCall.append("\t\t\t\tCHECK_PARAM_SIGNATURE(").append(CurModuleName).append(", ").append(ApiName).append(");\n\t\t\t\tJson::Value param = root[\"params\"];\n\t\t\t\t");
             if(api->retType.type != TY_void) {
                 FunctionCheckAndCall.append("ret[\"return\"] = ");
             }
