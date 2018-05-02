@@ -8,51 +8,10 @@
 #include <fstream>
 #include <exception>
 #include "GenCPP.h"
+#include "GenUtils.h"
 
-#define PROVIDER_TPL_FILE "./template/cpp/provider.tpl"
-#define CALLER_TPL_FILE "./template/cpp/caller.tpl"
-
-std::map<enum Type, std::tuple<std::string, std::string, std::string>> typeMap = {
-        {TY_string, {"std::string", "asString", "TY_string"}},
-        {TY_void,   {"void",        "",         "TY_void"}},
-        {TY_int,    {"int",         "asInt",    "TY_int"}},
-        {TY_any,    {"void*",       "",         "TY_any"}},
-        {TY_float,  {"float",       "asFloat",  "TY_float"}},
-        {TY_bool,   {"bool",        "asBool",   "TY_bool"}}
-};
-
-std::string &GetCppType(enum Type T)      { return std::get<0>(typeMap[T]); }
-std::string &GetJsonAsMethod(enum Type T) { return std::get<1>(typeMap[T]); }
-std::string &GetEnumName(enum Type T)     { return std::get<2>(typeMap[T]); }
-
-std::string ReadFileAsTxt(const std::string path)
-{
-    std::ifstream ifs(path);
-    if(!ifs.is_open()) {
-        throw std::invalid_argument(path);
-    }
-    std::string s;
-    while(!ifs.eof()) {
-        std::string tmp;
-        std::getline(ifs, tmp);
-        s.push_back('\n');
-        s.append(tmp);
-    }
-    ifs.close();
-    return s;
-}
-
-void substring_replace(std::string &str,const std::string &oldstr,const std::string &newstr)
-{
-    std::string::size_type pos=0;
-    std::string::size_type a=oldstr.size();
-    std::string::size_type b=newstr.size();
-    while((pos=str.find(oldstr,pos))!=std::string::npos)
-    {
-        str.replace(pos,a,newstr);
-        pos+=b;
-    }
-}
+#define PROVIDER_TPL_FILE "./template/cpp/provider.tpl.cpp"
+#define CALLER_TPL_FILE "./template/cpp/caller.tpl.cpp"
 
 /*
  * 将文件名转换为头文件宏定义符号
@@ -202,7 +161,11 @@ bool GenerateCPP_Caller(struct RootNode &document, class lex *lexer)
                 FunctionParams.append("\tparams[").append(std::to_string(paramIndex)).append("] = ").append(paramName).append(";\n");
                 paramIndex++;
             }
-            FunctionWithCallBack.append("void(*_callback)(").append(GetCppType(api->retType.type)).append("))\n{\n");
+            FunctionWithCallBack.append("void(*_callback)(");
+            if (api->retType.type == TY_void) {
+                FunctionWithCallBack.append(GetCppType(api->retType.type));
+            }
+            FunctionWithCallBack.append("))\n{\n");
             FunctionWithCallBack.append("\tJson::Value ret;\n"
                                         "\tunsigned int serial = GlobalSerialIndex++;\n"
                                         "\tBUILD_JSON_HEAD(ret, \"").append(FullApiName).append("\");\n");
