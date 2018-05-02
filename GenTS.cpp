@@ -29,7 +29,8 @@ bool GenerateTypeScript_Caller(struct RootNode &document, class lex *lexer) {
         int apiIndex = 0;
         for(auto api : module->apis) {
             std::string ApiName = lexer->GetString(api->name);
-            std::string FunctionParams;
+            std::string FullApiName, FunctionParams;
+            FullApiName.append(CurModuleName).append("::").append(ApiName);
             // Params
             FunctionWithCallBack.append("\tpublic static ").append(ApiName).append("(");
             int paramIndex = 0;
@@ -52,7 +53,7 @@ bool GenerateTypeScript_Caller(struct RootNode &document, class lex *lexer) {
                                         "\t\t\ttype: \"rpc\",\n");
             FunctionWithCallBack.append("\t\t\tversion: ").append(std::to_string(document.version)).append(",\n");
             FunctionWithCallBack.append("\t\t\tserial: thisSerial,\n"
-                                        "\t\t\tfuncName: \"").append(ApiName).append("\",\n");
+                                        "\t\t\tfuncName: \"").append(FullApiName).append("\",\n");
             FunctionWithCallBack.append("\t\t\tparams: [").append(FunctionParams).append("],\n");
             FunctionWithCallBack.append("\t\t};\n");
             if (api->retType.type ==  TY_void) {
