@@ -18,6 +18,9 @@ bool GenerateTypeScript_Caller(struct RootNode &document, class lex *lexer) {
     const char *ts_file_name = "ftrpc.caller.ts";
     std::string CallerTplFile = ReadFileAsTxt(CALLER_TPL_FILE);
     std::string FunctionWithCallBack;
+    std::string VersionString("\nlet version: number = ");
+    VersionString.append(std::to_string(document.version)).append(";\n");
+    CallerTplFile.insert(0, VersionString);
     // Module
     for(auto module : document.modules) {
         std::string CurModuleName = lexer->GetString(module->name);
@@ -28,7 +31,7 @@ bool GenerateTypeScript_Caller(struct RootNode &document, class lex *lexer) {
             std::string ApiName = lexer->GetString(api->name);
             std::string FunctionParams;
             // Params
-            FunctionWithCallBack.append("\tpublic ").append(ApiName).append("(");
+            FunctionWithCallBack.append("\tpublic static ").append(ApiName).append("(");
             int paramIndex = 0;
             for(auto param : api->params) {
                 std::string paramName = lexer->GetString(param->name);
@@ -41,20 +44,21 @@ bool GenerateTypeScript_Caller(struct RootNode &document, class lex *lexer) {
             }
             FunctionWithCallBack.append("_callback: (");
             if (api->retType.type != TY_void) {
-                FunctionWithCallBack.append(GetCppType(api->retType.type));
+                FunctionWithCallBack.append("RetValue: ").append(GetTsType(api->retType.type));
             }
             FunctionWithCallBack.append(") => void): string {\n");
-            FunctionWithCallBack.append("\t\tlet thisSerial = RPC.serial++;\n");
+            FunctionWithCallBack.append("\t\tlet thisSerial = ftrpc_caller.serial++;\n");
             FunctionWithCallBack.append("\t\tlet reqStruct: rpcPack = {\n"
-                                        "\t\t\ttype: \"rpc\",\n"
-                                        "\t\t\tserial: thisSerial,\n"
+                                        "\t\t\ttype: \"rpc\",\n");
+            FunctionWithCallBack.append("\t\t\tversion: ").append(std::to_string(document.version)).append(",\n");
+            FunctionWithCallBack.append("\t\t\tserial: thisSerial,\n"
                                         "\t\t\tfuncName: \"").append(ApiName).append("\",\n");
             FunctionWithCallBack.append("\t\t\tparams: [").append(FunctionParams).append("],\n");
             FunctionWithCallBack.append("\t\t};\n");
             if (api->retType.type ==  TY_void) {
-                FunctionWithCallBack.append("\t\tRPC.callbackMap_noret[thisSerial] = _callback;\n");
+                FunctionWithCallBack.append("\t\tftrpc_caller.callbackMap_noret[thisSerial] = _callback;\n");
             } else {
-                FunctionWithCallBack.append("\t\tRPC.callbackMap[thisSerial] = _callback;\n");
+                FunctionWithCallBack.append("\t\tftrpc_caller.callbackMap[thisSerial] = _callback;\n");
             }
             FunctionWithCallBack.append("\t\treturn JSON.stringify(reqStruct);\n"
                                         "\t}\n");

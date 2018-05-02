@@ -14,6 +14,7 @@ ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
     ADD_CUSTOM_COMMAND(OUTPUT copy_res
             COMMAND cp -a $(CMAKE_SOURCE_DIR)/template ./template
             COMMAND cp $(CMAKE_SOURCE_DIR)/License.txt ./License.txt
+            COMMAND sed -i '/\/\* SED REMOVE/,/!SED REMOVE\*\//d' ./template/typescript/caller.tpl.ts
             )
     add_custom_target(CopyTask ALL DEPENDS copy_res)
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "Windows")
