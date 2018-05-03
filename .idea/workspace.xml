@@ -13,8 +13,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="722d8a2b-917c-4f61-a242-bbe8d178132d" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/GenCPP.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/GenCPP.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/template/cpp/provider.tpl.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/template/cpp/provider.tpl.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/template/typescript/caller.tpl.ts" beforeDir="false" afterPath="$PROJECT_DIR$/template/typescript/caller.tpl.ts" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -30,7 +30,7 @@
       <file leaf-file-name="main.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1330">
+            <state relative-caret-position="1890">
               <caret line="70" column="1" selection-start-line="70" selection-start-column="1" selection-end-line="70" selection-end-column="1" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
@@ -42,7 +42,7 @@
       <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="304">
+            <state relative-caret-position="540">
               <caret line="20" column="88" selection-start-line="20" selection-start-column="88" selection-end-line="20" selection-end-column="88" />
             </state>
           </provider>
@@ -51,8 +51,17 @@
       <file leaf-file-name="GenTS.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GenTS.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="55" column="80" selection-start-line="55" selection-start-column="80" selection-end-line="55" selection-end-column="80" />
+            <state relative-caret-position="1059">
+              <caret line="60" column="20" selection-start-line="60" selection-start-column="20" selection-end-line="60" selection-end-column="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="caller.tpl.ts" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/template/typescript/caller.tpl.ts">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="189">
+              <caret line="50" column="63" selection-start-line="50" selection-start-column="63" selection-end-line="50" selection-end-column="63" />
             </state>
           </provider>
         </entry>
@@ -60,7 +69,7 @@
       <file leaf-file-name="lex.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lex.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="513">
+            <state relative-caret-position="729">
               <caret line="27" column="16" selection-start-line="27" selection-start-column="16" selection-end-line="27" selection-end-column="16" />
               <folding>
                 <element signature="e#75#94#0" expanded="true" />
@@ -72,8 +81,8 @@
       <file leaf-file-name="GenCPP.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GenCPP.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="526">
-              <caret line="87" column="40" selection-start-line="87" selection-start-column="40" selection-end-line="87" selection-end-column="40" />
+            <state relative-caret-position="2376">
+              <caret line="88" column="40" selection-start-line="88" selection-start-column="40" selection-end-line="88" selection-end-column="40" />
               <folding>
                 <element signature="e#43#57#0" expanded="true" />
               </folding>
@@ -81,7 +90,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="provider.tpl.cpp" pinned="false" current-in-tab="true">
+      <file leaf-file-name="provider.tpl.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/template/cpp/provider.tpl.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="361">
@@ -90,10 +99,15 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="GenTS.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/GenTS.h">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
       <file leaf-file-name="GenCPP.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/GenCPP.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="114">
+            <state relative-caret-position="162">
               <caret line="6" selection-start-line="6" selection-end-line="8" selection-end-column="16" />
               <folding>
                 <element signature="e#85#106#0" expanded="true" />
@@ -179,10 +193,10 @@
         <option value="$PROJECT_DIR$/GenUtils.cpp" />
         <option value="$PROJECT_DIR$/cmake-build-debug/ftrpc.caller.ts" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/template/typescript/caller.tpl.ts" />
         <option value="$PROJECT_DIR$/GenTS.cpp" />
         <option value="$PROJECT_DIR$/GenCPP.cpp" />
         <option value="$PROJECT_DIR$/template/cpp/provider.tpl.cpp" />
+        <option value="$PROJECT_DIR$/template/typescript/caller.tpl.ts" />
       </list>
     </option>
   </component>
@@ -196,7 +210,7 @@
     <packageJsonPaths />
   </component>
   <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="565" />
     <option name="y" value="90" />
     <option name="width" value="2175" />
@@ -228,6 +242,12 @@
               <item name="ftrpc" type="462c0819:PsiDirectoryNode" />
               <item name="template" type="462c0819:PsiDirectoryNode" />
               <item name="cpp" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ftrpc" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ftrpc" type="462c0819:PsiDirectoryNode" />
+              <item name="template" type="462c0819:PsiDirectoryNode" />
+              <item name="typescript" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -286,6 +306,8 @@
       <workItem from="1525225686877" duration="17430000" />
       <workItem from="1525263859465" duration="7398000" />
       <workItem from="1525278790842" duration="807000" />
+      <workItem from="1525314165145" duration="33000" />
+      <workItem from="1525317038795" duration="82000" />
     </task>
     <task id="LOCAL-00001" summary="调整目录结构，将模板文件独立出来">
       <created>1525227385187</created>
@@ -298,29 +320,28 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="131820000" />
+    <option name="totallyTimeSpent" value="131935000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="2062" height="1126" extended-state="6" />
-    <editor active="true" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.16090819" />
+      <window_info anchor="bottom" id="TypeScript" order="7" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.16069546" />
       <window_info anchor="bottom" id="TODO" order="7" />
-      <window_info anchor="bottom" id="Messages" order="8" weight="0.32763818" />
+      <window_info active="true" anchor="bottom" id="Messages" order="8" visible="true" weight="0.32719395" />
       <window_info anchor="bottom" id="CMake" order="12" weight="0.22860238" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Run" order="3" visible="true" weight="0.18894473" />
       <window_info anchor="bottom" id="Version Control" order="11" weight="0.32936078" />
+      <window_info anchor="bottom" id="Run" order="3" weight="0.18894473" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" order="9" weight="0.32931727" />
-      <window_info anchor="bottom" id="Debug" order="4" weight="0.30722892" />
       <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Debug" order="4" weight="0.30722892" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="6" weight="0.4" />
       <window_info anchor="bottom" id="Inspection Results" order="0" weight="0.32931727" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="bottom" id="TypeScript" order="7" />
       <window_info anchor="bottom" id="Message" order="1" />
       <window_info anchor="bottom" id="Cvs" order="5" weight="0.25" />
       <window_info anchor="bottom" id="Find" order="2" />
@@ -396,16 +417,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/GenCPP.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2375">
-          <caret line="125" column="61" selection-start-line="125" selection-start-column="61" selection-end-line="125" selection-end-column="61" />
-          <folding>
-            <element signature="e#43#57#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/GenCPP.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="114">
@@ -664,7 +675,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/GenCPP.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="114">
+        <state relative-caret-position="162">
           <caret line="6" selection-start-line="6" selection-end-line="8" selection-end-column="16" />
           <folding>
             <element signature="e#85#106#0" expanded="true" />
@@ -674,7 +685,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1330">
+        <state relative-caret-position="1890">
           <caret line="70" column="1" selection-start-line="70" selection-start-column="1" selection-end-line="70" selection-end-column="1" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
@@ -687,7 +698,7 @@
     <entry file="file://$PROJECT_DIR$/GenUtils.cpp" />
     <entry file="file://$PROJECT_DIR$/lex.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="513">
+        <state relative-caret-position="729">
           <caret line="27" column="16" selection-start-line="27" selection-start-column="16" selection-end-line="27" selection-end-column="16" />
           <folding>
             <element signature="e#75#94#0" expanded="true" />
@@ -697,7 +708,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
+        <state relative-caret-position="540">
           <caret line="20" column="88" selection-start-line="20" selection-start-column="88" selection-end-line="20" selection-end-column="88" />
         </state>
       </provider>
@@ -709,24 +720,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/template/typescript/caller.tpl.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="466">
-          <caret line="34" column="20" lean-forward="true" selection-start-line="34" selection-start-column="20" selection-end-line="34" selection-end-column="20" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/GenTS.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="55" column="80" selection-start-line="55" selection-start-column="80" selection-end-line="55" selection-end-column="80" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/GenCPP.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="526">
-          <caret line="87" column="40" selection-start-line="87" selection-start-column="40" selection-end-line="87" selection-end-column="40" />
+        <state relative-caret-position="2376">
+          <caret line="88" column="40" selection-start-line="88" selection-start-column="40" selection-end-line="88" selection-end-column="40" />
           <folding>
             <element signature="e#43#57#0" expanded="true" />
           </folding>
@@ -737,6 +734,23 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="361">
           <caret line="19" column="74" selection-start-line="19" selection-start-column="74" selection-end-line="19" selection-end-column="74" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GenTS.h">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/GenTS.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1059">
+          <caret line="60" column="20" selection-start-line="60" selection-start-column="20" selection-end-line="60" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/template/typescript/caller.tpl.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="189">
+          <caret line="50" column="63" selection-start-line="50" selection-start-column="63" selection-end-line="50" selection-end-column="63" />
         </state>
       </provider>
     </entry>

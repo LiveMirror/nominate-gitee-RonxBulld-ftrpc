@@ -43,12 +43,12 @@ export class ftrpc_caller {
         } else if(ansStruct.success == false) {
             return false;
         }
-        if(ftrpc_caller.callbackMap_noret.has(ansStruct.serial)) {
+        if(ansStruct.serial in ftrpc_caller.callbackMap_noret) {
             let ptr = ftrpc_caller.callbackMap_noret[ansStruct.serial];
             ftrpc_caller.callbackMap_noret.delete(ansStruct.serial);
             ptr();
             return true;
-        } else if (ftrpc_caller.callbackMap.has(ansStruct.serial)) {
+        } else if (ansStruct.serial in ftrpc_caller.callbackMap) {
             let ptr = ftrpc_caller.callbackMap[ansStruct.serial];
             ftrpc_caller.callbackMap.delete(ansStruct.serial);
             ptr(ansStruct.result);
