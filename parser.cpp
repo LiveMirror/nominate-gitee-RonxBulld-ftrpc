@@ -30,7 +30,7 @@
 
 parse::parse(const char *src)
 {
-    this->lexer = new lex(src);
+    this->lexer = new lex(src, &this->tokenManage);
 }
 
 void parse::reportError(const char *fmt, ...)

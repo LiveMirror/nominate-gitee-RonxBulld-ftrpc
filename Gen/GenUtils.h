@@ -5,8 +5,10 @@
 #ifndef FTRPC_GENUTILS_H
 #define FTRPC_GENUTILS_H
 
-#include "ast_tree.h"
-#include "lex.h"
+#define PROGRAM_VERSION_STR "2"
+#include "../ast_tree.h"
+#include "../lex.h"
+#include "../symman.h"
 #include <string>
 
 std::string &GetJsonAsMethod(enum Type T);

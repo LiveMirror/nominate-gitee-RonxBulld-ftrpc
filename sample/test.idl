@@ -1,0 +1,6 @@
+version = 1;
+module Test:
+{
+	void request([out]string req);
+	string requireNewStockInfo();
+};

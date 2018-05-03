@@ -23,10 +23,11 @@ std::set<char> Symbol = {':',';','[',']','{','}','(',')','='};
 
 const token EOF_Token { TOKEN_EOF, nullptr, 0, 0 };
 
-lex::lex(const char *src)
+lex::lex(const char *src, TokenManage *tokenManage)
 {
     this->src = strdup(src);
     this->maxptr = strlen(this->src);
+    this->tokenManage = tokenManage;
 #define TYPE(k)    this->keywdMap[#k] = TOKEN_##k;
 #define KEYWD(k)    this->keywdMap[#k] = TOKEN_##k;
 #include "keywords.h"
@@ -34,31 +35,27 @@ lex::lex(const char *src)
 
 void lex::TokenConvert(struct token &Tk)
 {
-    char *tmp = new char[Tk.length+1];
+    auto *tmp = new char[Tk.length+1];
     strncpy(tmp, Tk.literal, Tk.length);
     tmp[Tk.length] = '\0';
-    // Process keyword
     if(this->keywdMap.find(tmp) != this->keywdMap.end())
     {
+        // Process keyword
         Tk.type = this->keywdMap[tmp];
         Tk.value.i = (int)Tk.type;
     }
-    // Process identified
     else
     {
-        if(this->literalMap.find(tmp) == this->literalMap.end())
-        {
-            this->literalMap[tmp] = (StringID)this->literalMap.size();
-        }
+        // Process identified
+        Tk.value.string = this->tokenManage->operator[](tmp);
         Tk.type = TOKEN_ID;
-        Tk.value.string = this->literalMap[tmp];
     }
 	delete tmp;
 }
 
 void lex::IntegerConvert(struct token &Tk)
 {
-	char *tmp = new char[Tk.length + 1];
+	auto *tmp = new char[Tk.length + 1];
     strncpy(tmp, Tk.literal, Tk.length);
     tmp[Tk.length] = '\0';
     Tk.type = TOKEN_INTEGER_LITERAL;
@@ -84,7 +81,7 @@ void lex::popPtr()
 
 struct token lex::getToken()
 {
-    if(this->tokenStack.size() > 0)
+    if(!this->tokenStack.empty())
     {
         struct token T = this->tokenStack.top();
         this->tokenStack.pop();
@@ -147,7 +144,7 @@ struct token lex::getToken()
 struct lexer_info lex::getLexerInfo()
 {
     struct lexer_info lexinfo;
-    printf("%u\n", (unsigned int)this->start_ptr);
+//    printf("%u\n", (unsigned int)this->start_ptr);
     fflush(stdout);
     lexinfo.lineno = lexinfo.rowno = 1;
     for (size_t pos = 0; pos <= this->start_ptr; pos++) {
@@ -161,12 +158,12 @@ struct lexer_info lex::getLexerInfo()
     return lexinfo;
 }
 
-const std::string &lex::GetString(StringID id)
-{
-    for (auto iter = this->literalMap.begin(); iter != this->literalMap.end(); iter++) {
-        if (iter->second == id) {
-            return iter->first;
-        }
-    }
-    throw LexException("Cannot find STRING in literal map");
-}
+//const std::string &lex::GetString(StringID id)
+//{
+//    for (auto iter = this->literalMap.begin(); iter != this->literalMap.end(); iter++) {
+//        if (iter->second == id) {
+//            return iter->first;
+//        }
+//    }
+//    throw LexException("Cannot find STRING in literal map");
+//}

@@ -6,6 +6,7 @@
 #define FTRPC_PARSER_H
 
 #include "lex.h"
+#include "symman.h"
 #include "ast_tree.h"
 
 class parse
@@ -21,6 +22,8 @@ private:
     bool parseType(struct TypeNode *type);
 public:
     lex *lexer = nullptr;
+    TokenManage tokenManage;
+    TypeManage typeManage;
     explicit parse(const char *src);
     struct RootNode document;
     bool work();

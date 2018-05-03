@@ -10,6 +10,7 @@
 #include <map>
 #include <stack>
 #include <stdexcept>
+#include "symman.h"
 typedef unsigned int StringID;
 
 enum TokenEnum
@@ -67,14 +68,15 @@ private:
     void TokenConvert(struct token &Tk);
     void IntegerConvert(struct token &Tk);
     std::map<std::string, enum TokenEnum> keywdMap;
-    std::map<std::string, StringID> literalMap;
+//    std::map<std::string, StringID> literalMap;
     std::stack<struct token> tokenStack;
     std::stack<size_t> ptrStack;
     const char *src;
+    TokenManage *tokenManage;
 public:
-    explicit lex(const char *src);
+    explicit lex(const char *src, TokenManage *tokenManage);
     struct token getToken();
-    const std::string &GetString(StringID id);
+//    const std::string &GetString(StringID id);
     void pushBack(struct token T);
     struct lexer_info getLexerInfo();
     void pushPtr();

@@ -54,10 +54,10 @@ void CloseHeadToWrite(FILE *fp, const char *fn)
     fclose(fp);
 }
 
-bool GenerateCPP_Provider(struct RootNode &document, class lex *lexer)
+bool GenerateCPP_Provider(struct RootNode &document, TokenManage &tokenSystem, TypeManage &typeSystem)
 {
-    const char *head_file_name = "ftrpc.provider.h";
-    const char *src_file_name = "ftrpc.provider.cpp";
+    const char *head_file_name = "ftrpc.provider.v" PROGRAM_VERSION_STR ".h";
+    const char *src_file_name  = "ftrpc.provider.v" PROGRAM_VERSION_STR ".cpp";
 
     FILE *pProviderHeaderFile = OpenHeadToWrite(head_file_name);
     fprintf(pProviderHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document.version);
@@ -68,14 +68,14 @@ bool GenerateCPP_Provider(struct RootNode &document, class lex *lexer)
     std::string FunctionMicro, FunctionSignature, FunctionCheckAndCall;
     // Module
     for(auto module : document.modules) {
-        std::string CurModuleName = lexer->GetString(module->name);
+        std::string CurModuleName = tokenSystem[module->name];
         fprintf(pProviderHeaderFile, "class %s\n"
                                      "{\n"
                                      "public:\n", CurModuleName.c_str());
         // Api
         int apiIndex = 0;
         for(auto api : module->apis) {
-            std::string ApiName = lexer->GetString(api->name);
+            std::string ApiName = tokenSystem[api->name];
             std::string FullApiName;
             FullApiName.append(CurModuleName).append("::").append(ApiName);
 
@@ -93,7 +93,7 @@ bool GenerateCPP_Provider(struct RootNode &document, class lex *lexer)
             // Params
             int paramIndex = 0;
             for(auto param : api->params) {
-                fprintf(pProviderHeaderFile, "%s %s,", GetCppType(param->type.type).c_str(), lexer->GetString(param->name).c_str());
+                fprintf(pProviderHeaderFile, "%s %s,", GetCppType(param->type.type).c_str(), tokenSystem[param->name].c_str());
 
                 FunctionSignature.append("ti2c[").append(GetEnumName(param->type.type)).append("], ");
                 FunctionCheckAndCall.append("param[").append(std::to_string(paramIndex++)).append("].").append(GetJsonAsMethod(param->type.type)).append("(), ");
@@ -124,10 +124,10 @@ bool GenerateCPP_Provider(struct RootNode &document, class lex *lexer)
     return true;
 }
 
-bool GenerateCPP_Caller(struct RootNode &document, class lex *lexer)
+bool GenerateCPP_Caller(struct RootNode &document, TokenManage &tokenSystem, TypeManage &typeSystem)
 {
-    const char *head_file_name = "ftrpc.caller.h";
-    const char *src_file_name = "ftrpc.caller.cpp";
+    const char *head_file_name = "ftrpc.caller.v" PROGRAM_VERSION_STR ".h";
+    const char *src_file_name  = "ftrpc.caller.v" PROGRAM_VERSION_STR ".cpp";
 
     FILE *pCallerHeaderFile = OpenHeadToWrite(head_file_name);
     fprintf(pCallerHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document.version);
@@ -140,14 +140,14 @@ bool GenerateCPP_Caller(struct RootNode &document, class lex *lexer)
 
     // Module
     for(auto module : document.modules) {
-        std::string CurModuleName = lexer->GetString(module->name);
+        std::string CurModuleName = tokenSystem[module->name];
         fprintf(pCallerHeaderFile, "class %s\n"
                                    "{\n"
                                    "public:\n", CurModuleName.c_str());
         // Api
         int apiIndex = 0;
         for(auto api : module->apis) {
-            std::string ApiName = lexer->GetString(api->name);
+            std::string ApiName = tokenSystem[api->name];
             fprintf(pCallerHeaderFile, "\tstatic std::string %s(", ApiName.c_str());
             std::string FullApiName, FunctionParams;
             FullApiName.append(CurModuleName).append("::").append(ApiName);
@@ -156,7 +156,7 @@ bool GenerateCPP_Caller(struct RootNode &document, class lex *lexer)
             // Params
             int paramIndex = 0;
             for(auto param : api->params) {
-                std::string paramName = lexer->GetString(param->name);
+                std::string paramName = tokenSystem[param->name];
                 fprintf(pCallerHeaderFile, "%s %s, ", GetCppType(param->type.type).c_str(), paramName.c_str());
                 FunctionWithCallBack.append(GetCppType(param->type.type)).append(" ").append(paramName).append(", ");
                 FunctionParams.append("\tparams[").append(std::to_string(paramIndex)).append("] = ").append(paramName).append(";\n");
@@ -195,9 +195,9 @@ bool GenerateCPP_Caller(struct RootNode &document, class lex *lexer)
     CloseHeadToWrite(pCallerHeaderFile, head_file_name);
 }
 
-bool GenerateCPP(struct RootNode &document, class lex *lexer)
+bool GenerateCPP(struct RootNode &document, TokenManage &tokenSystem, TypeManage &typeSystem)
 {
-    GenerateCPP_Provider(document, lexer);
-    GenerateCPP_Caller(document, lexer);
+    GenerateCPP_Provider(document, tokenSystem, typeSystem);
+    GenerateCPP_Caller(document, tokenSystem, typeSystem);
     return true;
 }

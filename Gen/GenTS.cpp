@@ -14,8 +14,8 @@
 // #define PROVIDER_TPL_FILE "./template/typescript/provider.tpl.ts"
 #define CALLER_TPL_FILE "./template/typescript/caller.tpl.ts"
 
-bool GenerateTypeScript_Caller(struct RootNode &document, class lex *lexer) {
-    const char *ts_file_name = "ftrpc.caller.ts";
+bool GenerateTypeScript_Caller(struct RootNode &document, TokenManage &tokenSystem, TypeManage &typeSystem) {
+    const char *ts_file_name = "ftrpc.caller.v" PROGRAM_VERSION_STR ".ts";
     std::string CallerTplFile = ReadFileAsTxt(CALLER_TPL_FILE);
     std::string FunctionWithCallBack;
     std::string VersionString("\nlet version: number = ");
@@ -23,19 +23,19 @@ bool GenerateTypeScript_Caller(struct RootNode &document, class lex *lexer) {
     CallerTplFile.insert(0, VersionString);
     // Module
     for(auto module : document.modules) {
-        std::string CurModuleName = lexer->GetString(module->name);
+        std::string CurModuleName = tokenSystem[module->name];
         FunctionWithCallBack.append("export class ").append(CurModuleName).append(" {\n");
         // Api
         int apiIndex = 0;
         for(auto api : module->apis) {
-            std::string ApiName = lexer->GetString(api->name);
+            std::string ApiName = tokenSystem[api->name];
             std::string FullApiName, FunctionParams;
             FullApiName.append(CurModuleName).append("::").append(ApiName);
             // Params
             FunctionWithCallBack.append("\tpublic static ").append(ApiName).append("(");
             int paramIndex = 0;
             for(auto param : api->params) {
-                std::string paramName = lexer->GetString(param->name);
+                std::string paramName = tokenSystem[param->name];
                 FunctionWithCallBack.append(paramName).append(": ").append(GetTsType(param->type.type)).append(", ");
                 FunctionParams.append(paramName).append(", ");
                 paramIndex++;
@@ -78,6 +78,6 @@ bool GenerateTypeScript_Caller(struct RootNode &document, class lex *lexer) {
     fclose(pCallerSrcFile);
 }
 
-bool GenerateTypeScript(struct RootNode &document, class lex *lexer){
-    GenerateTypeScript_Caller(document, lexer);
+bool GenerateTypeScript(struct RootNode &document, TokenManage &tokenSystem, TypeManage &typeSystem){
+    GenerateTypeScript_Caller(document, tokenSystem, typeSystem);
 }
