@@ -9,6 +9,6 @@
 #include "../lex.h"
 #include "GenUtils.h"
 
-bool GenerateCPP(struct RootNode &document, TokenManage &tokenSystem, TypeManage &typeSystem);
+bool GenerateCPP(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem);
 
 #endif //FTRPC_GEN_H

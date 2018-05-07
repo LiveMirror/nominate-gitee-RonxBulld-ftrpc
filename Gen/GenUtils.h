@@ -11,8 +11,11 @@
 #include "../symman.h"
 #include <string>
 
-std::string &GetJsonAsMethod(enum Type T);
-std::string &GetEnumName(enum Type T);
+extern bool hadVersionInfo;
+
+bool RegistType(enum Type type, std::string &JsonCheckMethod, std::string &JsonParseMethod, std::string &CppTypeName_Gen, std::string &TypescriptTypeName_Gen);
+std::string &GetJsonCheckMethod(enum Type T);
+std::string &GetJsonConvertMethod(enum Type T);
 std::string &GetCppType(enum Type T);
 std::string &GetTsType(enum Type T);
 std::string ReadFileAsTxt(std::string path);

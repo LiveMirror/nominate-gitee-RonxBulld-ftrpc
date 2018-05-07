@@ -32,16 +32,11 @@ private:
     std::map<TypeID, TokenID> ty2tk;    // TypeID -> TokenID
     std::map<TypeID, MemberLists> StructsMap;    // TypeID { TypeID* }
 public:
+    TypeManage(std::initializer_list<Member> initBaseType);
     enum typeDefType { DeclareBase, DeclareStruct };
-    /*
-     * struct $Name:
-     * {
-     *      TypeID TokenID;
-     *      ...
-     * };
-     */
     void registType(TokenID Name, enum typeDefType DeclareType, MemberLists &MemberList);
     TypeID getTypeID(TokenID Name);
+    bool isType(TokenID Name);
 };
 
 #endif //FTRPC_SYMMAN_H

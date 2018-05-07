@@ -11,7 +11,7 @@ class rpcResult {
     public type: string = "";
     public serial: number = -1;
     public success: boolean = false;
-    public result: any = null;
+    public return: any = null;
 }
 
 // #@{Non-blocking RPC with callback}@#
@@ -51,7 +51,7 @@ export class ftrpc_caller {
         } else if (ansStruct.serial in ftrpc_caller.callbackMap) {
             let ptr = ftrpc_caller.callbackMap[ansStruct.serial];
             ftrpc_caller.callbackMap.delete(ansStruct.serial);
-            ptr(ansStruct.result);
+            ptr(ansStruct.return);
             return true;
         } else {
             return false;

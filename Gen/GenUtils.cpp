@@ -8,19 +8,29 @@
 
 #include "GenUtils.h"
 
+/*
+ * TypeID | Json Check Method |Json Parse Method | C++ Enum Name | C++ Type Name(Gen) | TypeScript Type Name(Gen)
+ */
+enum ColumnSerial {
+    JsonCheckMethod, JsonParseMethod, CppTypeName_Gen, TypescriptTypeName_Gen
+};
 std::map<enum Type, std::tuple<std::string, std::string, std::string, std::string>> typeMap = {
-        {TY_string, {"asString", "TY_string", "std::string", "string"}},
-        {TY_void,   {"",         "TY_void",   "void",        "void"}},
-        {TY_int,    {"asInt",    "TY_int",    "int",         "int"}},
-        {TY_any,    {"",         "TY_any",    "void*",       "any"}},
-        {TY_float,  {"asFloat",  "TY_float",  "float",       "float"}},
-        {TY_bool,   {"asBool",   "TY_bool",   "bool",        "boolean"}}
+        {TY_string, {"isString", "asString", "std::string", "string"}},
+        {TY_void,   {"isNull",   "",         "void",        "void"}},
+        {TY_int,    {"isInt",    "asInt",    "int",         "number"}},
+        {TY_any,    {"isObject", "",         "void*",       "any"}},
+        {TY_float,  {"isDouble", "asFloat",  "float",       "float"}},
+        {TY_bool,   {"isBool",   "asBool",   "bool",        "boolean"}}
 };
 
-std::string &GetJsonAsMethod(enum Type T) { return std::get<0>(typeMap[T]); }
-std::string &GetEnumName(enum Type T)     { return std::get<1>(typeMap[T]); }
-std::string &GetCppType(enum Type T)      { return std::get<2>(typeMap[T]); }
-std::string &GetTsType(enum Type T)       { return std::get<3>(typeMap[T]); }
+bool RegistType(enum Type type, std::string &JsonCheckMethod, std::string &JsonParseMethod, std::string &CppTypeName_Gen, std::string &TypescriptTypeName_Gen) {
+    std::tuple<std::string, std::string, std::string, std::string> insItem{JsonCheckMethod, JsonParseMethod, CppTypeName_Gen, TypescriptTypeName_Gen};
+    typeMap.insert(std::make_pair(type, insItem));
+}
+std::string &GetJsonCheckMethod(enum Type T)   { return std::get<JsonCheckMethod>(typeMap[T]); }
+std::string &GetJsonConvertMethod(enum Type T) { return std::get<JsonParseMethod>(typeMap[T]); }
+std::string &GetCppType(enum Type T)           { return std::get<CppTypeName_Gen>(typeMap[T]); }
+std::string &GetTsType(enum Type T)            { return std::get<TypescriptTypeName_Gen>(typeMap[T]); }
 
 std::string ReadFileAsTxt(const std::string path) {
     std::ifstream ifs(path);

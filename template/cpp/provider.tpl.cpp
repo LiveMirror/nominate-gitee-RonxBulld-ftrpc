@@ -3,7 +3,10 @@
 #include <map>
 #include <sstream>
 #include <memory>
-#include "ftrpc.provider.h"
+// #@{FTRPC Provider Head File}@#
+#ifdef PROVIDER_DEMO_INSIDE
+#include "ftrpc.provider.v2.h"
+#endif
 #include "json/json.h"
 #include "TypeDef.h"
 
@@ -17,30 +20,11 @@
                        RETURN; }while(0)
 #define CHECK_PARAM_COUNT(PARAM_COUNT) do{ if(paramCount != (PARAM_COUNT)) \
                                            FAILED("The number of parameters is incorrect."); }while(0)
-#define CHECK_PARAM_SIGNATURE(Module, Function) do{ if(paramentSignature != FunctionSignatureDictionary[FUNCTION_##Module##_##Function]) \
-                                                    FAILED("The parameter type signature is inconsistent with the definition."); }while(0)
 
 constexpr unsigned long long int HashStringToInt(const char *str, unsigned long long int hash = 0)
 {
     return (*str == 0) ? hash : 101 * HashStringToInt(str + 1) + *str;
 }
-
-std::map<unsigned int, const char> ti2c = {
-        {TY_float,  'f'},
-        {TY_string, 's'},
-        {TY_int,    'i'},
-        {TY_bool,   'b'}
-};
-
-/*
- * Mapping Json::ValueType to function signature
- */
-std::map<Json::ValueType, const char> jvt2c = {
-        {Json::ValueType::realValue,    ti2c[TY_float]},
-        {Json::ValueType::stringValue,  ti2c[TY_string]},
-        {Json::ValueType::intValue,     ti2c[TY_int]},
-        {Json::ValueType::booleanValue, ti2c[TY_bool]}
-};
 
 // #@{FUNCTION_XXX micro}@#
 #ifdef PROVIDER_DEMO_INSIDE
@@ -48,14 +32,40 @@ std::map<Json::ValueType, const char> jvt2c = {
 #define FUNCTION_Test_testFunction 1
 #endif
 
-std::map<unsigned int, const std::string> FunctionSignatureDictionary = {
-// #@{Function Signature}@#
+// #@{Custom struct declare}@#
 #ifdef PROVIDER_DEMO_INSIDE
-        { FUNCTION_Test_requireNewStockInfo, std::string({}) },
-        { FUNCTION_Test_testFunction, std::string({ti2c[TY_float], ti2c[TY_string], ti2c[TY_int], ti2c[TY_bool], ti2c[TY_string], ti2c[TY_float]}) },
-#endif
+struct Custom
+{
+    int a;
+    std::string b;
+    bool c;
 };
+#endif
 
+class JsonValueExtra : public Json::Value
+{
+public:
+// #@{Custom struct convert method}@#
+#ifdef PROVIDER_DEMO_INSIDE
+    bool isCustomStruct() {
+        if (!this->operator[]("a").isInt()) { return false; }
+        if (!this->operator[]("b").isString()) { return false;}
+        if (!this->operator[]("c").isBool()) { return false; }
+        return true;
+    }
+    struct Custom asCustomStruct() {
+        if (!this->isCustomStruct()) {
+            throw std::runtime_error("Cannot parse custom struct");
+        }
+        struct Custom _custom;
+        _custom.a = this->operator[]("a").asInt();
+        _custom.b = this->operator[]("b").asString();
+        _custom.c = this->operator[]("c").asBool();
+        return _custom;
+    }
+#endif
+    JsonValueExtra(const Json::Value &jvalue) : Json::Value(jvalue) { }
+};
 
 std::string ProviderDoCall(const std::string &JSON)
 {
@@ -79,39 +89,14 @@ std::string ProviderDoCall(const std::string &JSON)
         ret["serial"] = serial;
         std::string funcName = root["funcName"].asString();
         int paramCount = -1;
-        if(root["params"].isArray()) {
-            paramCount = root["params"].size();
-        }
-        // Collect parameter signatures.
-        std::string paramentSignature = "";
-        for(int i = 0; i < paramCount; i++) {
-            Json::Value param = root["params"];
-            auto mdp = jvt2c.find(param.type());
-            if(mdp == jvt2c.end())
-                FAILED("Unsupported parameter type.");
-            paramentSignature.push_back(jvt2c[param.type()]);
+        JsonValueExtra param = root["params"];
+        if(param.isArray()) {
+            paramCount = param.size();
         }
         // The parameter signature verifies and executes the call.
         switch (HashStringToInt(funcName.c_str()))
         {
 // #@{Function Check and Call}@#
-#ifdef PROVIDER_DEMO_INSIDE
-            case HashStringToInt("Test::requireNewStockInfo"): {
-                CHECK_PARAM_COUNT(0);
-                CHECK_PARAM_SIGNATURE(Test, requireNewStockInfo);
-                Json::Value param = root["params"];
-                Test::requireNewStockInfo();
-                break;
-            }
-            case HashStringToInt("Test::testFunction"): {
-                CHECK_PARAM_COUNT(6);
-                CHECK_PARAM_SIGNATURE(Test, testFunction);
-                Json::Value param = root["params"];
-                ret["return"] = Test::testFunction(param[0].asFloat(), param[1].asString(), param[2].asInt(),
-                                                   param[3].asBool(), param[4].asString(), param[5].asFloat());
-                break;
-            }
-#endif
         }
     }
     ret["success"] = true;

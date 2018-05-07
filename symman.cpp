@@ -20,6 +20,15 @@ const std::string &TokenManage::operator[](const TokenID &ID) {
     }
 }
 
+
+TypeManage::TypeManage(std::initializer_list<Member> initBaseType) {
+    for(auto member : initBaseType) {
+        this->tk2ty.insert(std::make_pair(member.second, member.first));
+        this->ty2tk.insert(std::make_pair(member.first, member.second));
+        this->indexReg = member.first >= this->indexReg ? member.first + 1 : this->indexReg;
+    }
+}
+
 TypeID TypeManage::getTypeID(TokenID Name) {
     if (this->tk2ty.find(Name) != this->tk2ty.end()) {
         throw std::runtime_error("Referenced an undefined type.");
@@ -45,5 +54,11 @@ void TypeManage::registType(TokenID Name, enum typeDefType DeclareType, MemberLi
             // No extra work needs to be done.
             break;
         }
+        default:
+            throw std::runtime_error("DeclareType was set to an inappropriate value.");
     }
+}
+
+bool TypeManage::isType(TokenID Name) {
+    return this->tk2ty.find(Name) != this->tk2ty.end();
 }

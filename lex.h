@@ -29,7 +29,7 @@ struct token
     enum TokenEnum type;
     const char * literal;
     size_t length;
-    union
+    union MultiVal
     {
         int i;
         StringID string;

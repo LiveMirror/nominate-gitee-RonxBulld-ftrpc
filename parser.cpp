@@ -7,26 +7,25 @@
 #include <string.h>
 #include "parser.h"
 #include "lex.h"
+#include "ast_tree.h"
 
 #define GETTOKEN(T) (T) = this->lexer->getToken()
 #define CHECK_TOKEN_IF(T, Type, ErrorMsg) if((T).type != (Type)) { \
                                                 this->reportError(ErrorMsg); \
-                                                return false; \
+                                                return nullptr; \
                                              }
-#define REQUIRE_TOKEN(T, Type, ErrorMsg) GETTOKEN(T); CHECK_TOKEN_IF(T, Type, ErrorMsg)
+#define REQUIRE_TOKEN(T, Type, ErrorMsg) do { \
+                                                GETTOKEN(T); \
+                                                CHECK_TOKEN_IF(T, Type, ErrorMsg); \
+                                            } while(0)
 #define PUSHBACK(T) this->lexer->pushBack(T)
-#define CALL_UNTERMINAL_PARSER(unterminal, param) this->lexer->pushPtr(); \
-                                                       if (!this->parse##unterminal(param)) { \
-                                                           this->lexer->popPtr(); \
-                                                           return false; \
-                                                       }
-#define TRY_CALL_UNTERMINAL_PARSER(unterminal, param) ([&](){ \
-                                                            this->noPrint = true; \
-                                                            CALL_UNTERMINAL_PARSER(unterminal, param) else { \
-                                                                return true;\
-                                                            } \
-                                                            this->noPrint = false; \
-                                                            })()
+#define SEE_NEXT_TOKEN(T) do { GETTOKEN(T); PUSHBACK(T); } while (0)
+#define CALL_UNTERMINAL_PARSER(unterminal) ([&](){ \
+                                                   this->lexer->pushPtr(); \
+                                                   std::unique_ptr<unterminal##Node> node = this->parse##unterminal(); \
+                                                   if (node == nullptr) { this->lexer->popPtr(); } \
+                                                   return node; \
+                                               })()
 
 parse::parse(const char *src)
 {
@@ -47,137 +46,154 @@ void parse::reportError(const char *fmt, ...)
 }
 
 /*
- * in_out_property : ( '[' (TOKEN_IN('|' TOKEN_OUT)?)|TOKEN_OUT ']' )?
+ * struct : TOKEN_struct TOKEN_ID { (type TOKENID ,)* } ;
  */
-bool parse::parseInOutProperty(struct ParamNode *param)
-{
-    struct token T;
-    GETTOKEN(T);
-    if(T.type == '[') {
-        GETTOKEN(T);
-        if(T.type == TOKEN_in) {
-            param->inFeature = true;
-            GETTOKEN(T);
-            if(T.type == '|') {
-                REQUIRE_TOKEN(T, TOKEN_out, "Only input 'out' after '|'.");
-                param->outFeature = true;
-            } else {
-                PUSHBACK(T);
-            }
-        }
-        else if(T.type == TOKEN_out) {
-            param->outFeature = true;
-        }
-        REQUIRE_TOKEN(T, ']', "Request ']'.");
-    } else {
-        PUSHBACK(T);
+std::unique_ptr<StructNode> parse::parseStruct() {
+    token T;
+    std::unique_ptr<StructNode> structure(new StructNode());
+    REQUIRE_TOKEN(T, TOKEN_struct, "Require `struct`.");
+    REQUIRE_TOKEN(T, TOKEN_ID, "Anonymouse struct is not supported.");
+    structure->name = T.value.string;
+    REQUIRE_TOKEN(T, '{', "Require `{`.");
+    SEE_NEXT_TOKEN(T);
+    MemberLists members;
+    while (T.type != '}') {
+        std::unique_ptr<TypeNode> type = CALL_UNTERMINAL_PARSER(Type);
+        REQUIRE_TOKEN(T, TOKEN_ID, "Require member name after type.");
+        Member member;
+        member.first = type->type;
+        member.second = T.value.string;
+        members.push_back(member);
+        SEE_NEXT_TOKEN(T);
     }
-    return true;
+    typeManage.registType(structure->name, TypeManage::typeDefType::DeclareStruct, members);
+    structure->type = (enum Type)typeManage.getTypeID(structure->name);
+    REQUIRE_TOKEN(T, '}', "Require `}`.");
+    REQUIRE_TOKEN(T, ';', "Require `;`.");
+    return structure;
 }
 
 /*
- * type : TOKEN_void | TOKEN_int | TOKEN_string ;
+ * type : TOKEN_void | TOKEN_int | TOKEN_string | TOKEN_float | TOKEN_bool | struct;
  */
-bool parse::parseType(struct TypeNode *type)
+std::unique_ptr<TypeNode> parse::parseType()
 {
-    struct token T;
+    std::unique_ptr<TypeNode> type(new TypeNode());
+    token T;
     GETTOKEN(T);
-    switch (T.type)
-    {
-        case TOKEN_void:
+    switch (T.type) {
+        case TOKEN_void: {
             type->type = TY_void;
+        }
             break;
-        case TOKEN_int:
+        case TOKEN_int: {
             type->type = TY_int;
+        }
             break;
-        case TOKEN_string:
+        case TOKEN_string: {
             type->type = TY_string;
+        }
             break;
-        default:
+        case TOKEN_float: {
+            type->type = TY_float;
+        }
+            break;
+        case TOKEN_bool: {
+            type->type = TY_bool;
+        }
+            break;
+        case TOKEN_struct: {
+            type->type = TY_struct;
+            PUSHBACK(T);
+            std::unique_ptr<StructNode> structure = CALL_UNTERMINAL_PARSER(Struct);
+            type->type = structure->type;
+        }
+            break;
+        default: {
             char tmp[T.length + 1];
             strncpy(tmp, T.literal, T.length);
             tmp[T.length + 1] = '\0';
             this->reportError("Not supported type - %s.", tmp);
-            return false;
-    }
-    return true;
-}
-
-/*
- * parament : in_out_property type TOKEN_ID ;
- */
-bool parse::parseParament(struct ApiNode *api)
-{
-    struct ParamNode param;
-    CALL_UNTERMINAL_PARSER(InOutProperty, &param);
-    CALL_UNTERMINAL_PARSER(Type, &param.type);
-    if(param.type.type == TY_void) {
-        this->reportError("The parameter type should not be void.");
-        return false;
-    }
-    struct token T;
-    REQUIRE_TOKEN(T, TOKEN_ID, "You should provide the argument name.");
-    param.name = T.value.string;
-    api->params.push_back(new ParamNode(param));
-    return true;
-}
-
-/*
- * api_list : (type TOKEN_ID '(' (parament (',' parament)*)?')' ';')* ;
- */
-bool parse::parseApiList(struct ModuleNode *module)
-{
-    struct ApiNode api, apiBlank;
-    while(TRY_CALL_UNTERMINAL_PARSER(Type, &api.retType)) {
-        struct token T;
-        REQUIRE_TOKEN(T, TOKEN_ID, "You should provide the api name.");
-        api.name = T.value.string;
-        REQUIRE_TOKEN(T, '(', "Request ')'.");
-        GETTOKEN(T);
-        if (T.type != ')') {
-            PUSHBACK(T);
-            do {
-                CALL_UNTERMINAL_PARSER(Parament, &api);
-                GETTOKEN(T);
-            } while (T.type == ',');
-            PUSHBACK(T);
-            REQUIRE_TOKEN(T, ')', "Request ')'.");
+            return nullptr;
         }
-        REQUIRE_TOKEN(T, ';', "Request ';'.");
-        module->apis.push_back(new ApiNode(api));
-        api = apiBlank;
     }
-    return true;
+    return type;
 }
 
 /*
- * module_list : ( TOKEN_MODULE TOKEN_ID ':' '{' api_list '}' )* ;
+ * parament : type TOKEN_ID ;
  */
-bool parse::parseModuleList(struct RootNode *root)
+std::unique_ptr<ParamNode> parse::parseParam()
 {
-    struct ModuleNode module, mnBlank;
-    struct token T;
+    std::unique_ptr<ParamNode> param(new ParamNode());
+    param->type = *CALL_UNTERMINAL_PARSER(Type);
+    if(param->type.type == TY_void) {
+        this->reportError("The parameter type should not be void.");
+        return nullptr;
+    }
+    token T;
+    REQUIRE_TOKEN(T, TOKEN_ID, "You should provide the argument name.");
+    param->name = T.value.string;
+    return param;
+}
+
+/*
+ * api : type TOKEN_ID '(' (parament (',' parament)*)?')' ';' ;
+ */
+std::unique_ptr<ApiNode> parse::parseApi() {
+    std::unique_ptr<ApiNode> api(new ApiNode());
+    token T;
+    std::unique_ptr<TypeNode> type = CALL_UNTERMINAL_PARSER(Type);
+    api->retType.type = type->type;
+    REQUIRE_TOKEN(T, TOKEN_ID, "You should provide the api name.");
+    api->name = T.value.string;
+    REQUIRE_TOKEN(T, '(', "Request ')'.");
+    SEE_NEXT_TOKEN(T);
+    if (T.type != ')') {
+        do {
+            std::unique_ptr<ParamNode> param = CALL_UNTERMINAL_PARSER(Param);
+            api->params.push_back(*param);
+            GETTOKEN(T);
+        } while (T.type == ',');
+        PUSHBACK(T);
+    }
+    REQUIRE_TOKEN(T, ')', "Request ')'.");
+    REQUIRE_TOKEN(T, ';', "Request ';'.");
+    return api;
+}
+
+/*
+ * module : ( TOKEN_MODULE TOKEN_ID ':' '{' api* '}' )* ;
+ */
+std::unique_ptr<ModuleNode> parse::parseModule()
+{
+    std::unique_ptr<ModuleNode> module(new ModuleNode());
+    token T;
     GETTOKEN(T);
-    while(T.type == TOKEN_module) {
+    if(T.type == TOKEN_module) {
         REQUIRE_TOKEN(T, TOKEN_ID, "Anonymous module is not supported.");
-        module.name = T.value.string;
+        module->name = T.value.string;
         REQUIRE_TOKEN(T, ':', "Request ':'.");
         REQUIRE_TOKEN(T, '{', "Request '{'.");
-        CALL_UNTERMINAL_PARSER(ApiList, &module);
+        SEE_NEXT_TOKEN(T);
+        if (typeManage.isType(T.type)) {
+            do {
+                std::unique_ptr<ApiNode> api = CALL_UNTERMINAL_PARSER(Api);
+                module->apis.push_back(*api);
+                SEE_NEXT_TOKEN(T);
+            } while (typeManage.isType(T.type));
+        }
         REQUIRE_TOKEN(T, '}', "Request '}'.");
-        GETTOKEN(T);
-        root->modules.push_back(new ModuleNode(module));
-        module = mnBlank;
     }
-    PUSHBACK(T);
-    return true;
+    return module;
 }
 
 /*
- * document : VERSION '=' INTEGER_LITERAL ';' module_list ;
+ * document : VERSION '=' INTEGER_LITERAL ';' module* ;
  */
-bool parse::parseDocument(struct RootNode *root)
+std::unique_ptr<RootNode> parse::parseRoot()
 {
+    std::unique_ptr<RootNode> root(new RootNode());
     // declare version first
     struct token T;
     REQUIRE_TOKEN(T, TOKEN_version, "Must declare script version first.");
@@ -185,12 +201,20 @@ bool parse::parseDocument(struct RootNode *root)
     REQUIRE_TOKEN(T, TOKEN_INTEGER_LITERAL, "Request Version.");
     root->version = (unsigned int)T.value.i;
     REQUIRE_TOKEN(T, ';', "Request ';'.");
-    CALL_UNTERMINAL_PARSER(ModuleList, root);
-    return true;
+    SEE_NEXT_TOKEN(T);
+    if (T.type == TOKEN_module) {
+        do {
+            std::unique_ptr<ModuleNode> module = CALL_UNTERMINAL_PARSER(Module);
+            ModuleNode Tmn = *module;
+            root->modules.push_back(Tmn);
+            SEE_NEXT_TOKEN(T);
+        } while (T.type == TOKEN_module);
+    }
+    return root;
 }
 
 bool parse::work()
 {
-    CALL_UNTERMINAL_PARSER(Document, &this->document);
+    this->document = CALL_UNTERMINAL_PARSER(Root);
     return true;
 }

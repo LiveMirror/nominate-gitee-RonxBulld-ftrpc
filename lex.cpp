@@ -19,7 +19,7 @@
     (T).literal = this->src + this->start_ptr
 
 std::set<char> Blank = {' ','\t','\r','\n','\a'};
-std::set<char> Symbol = {':',';','[',']','{','}','(',')','='};
+std::set<char> Symbol = {':',';','[',']','{','}','(',')','=',','};
 
 const token EOF_Token { TOKEN_EOF, nullptr, 0, 0 };
 

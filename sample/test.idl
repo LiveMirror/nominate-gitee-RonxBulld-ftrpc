@@ -1,6 +1,6 @@
 version = 1;
 module Test:
 {
-	void request([out]string req);
+	void request(string req, int tz, bool flag);
 	string requireNewStockInfo();
 };

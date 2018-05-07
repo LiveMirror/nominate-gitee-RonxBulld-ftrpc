@@ -38,80 +38,84 @@ std::string FilenameToMacro(const char *fn)
 FILE *OpenHeadToWrite(const char *fn, const char *mode = "w+")
 {
     FILE *fp = fopen(fn, mode);
-    const char *mdef = FilenameToMacro(fn).c_str();
+    std::string mdef = FilenameToMacro(fn);
     fprintf(fp, "#ifndef %s\n"
                 "#define %s\n"
-                "\n", mdef, mdef);
+                "\n", mdef.c_str(), mdef.c_str());
     return fp;
 }
 
 void CloseHeadToWrite(FILE *fp, const char *fn)
 {
-    const char *mdef = FilenameToMacro(fn).c_str();
+    std::string mdef = FilenameToMacro(fn);
     fprintf(fp, "\n"
-                "\n#endif // %s\n", mdef);
+                "\n#endif // %s\n", mdef.c_str());
     // End generate
     fclose(fp);
 }
 
-bool GenerateCPP_Provider(struct RootNode &document, TokenManage &tokenSystem, TypeManage &typeSystem)
+bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem)
 {
-    const char *head_file_name = "ftrpc.provider.v" PROGRAM_VERSION_STR ".h";
-    const char *src_file_name  = "ftrpc.provider.v" PROGRAM_VERSION_STR ".cpp";
+    char head_file_name[32], src_file_name[32];
+    sprintf(head_file_name, "ftrpc.provider%s.h", hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
+    sprintf(src_file_name, "ftrpc.provider%s.cpp", hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
 
     FILE *pProviderHeaderFile = OpenHeadToWrite(head_file_name);
-    fprintf(pProviderHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document.version);
+    fprintf(pProviderHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document->version);
     fprintf(pProviderHeaderFile, "\n#include <string>\n\n"
                                  "std::string ProviderDoCall(const std::string &JSON);\n\n");
     FILE *pProviderSrcFile = fopen(src_file_name, "w+");
     std::string ProviderTplFile = ReadFileAsTxt(PROVIDER_TPL_FILE);
-    std::string FunctionMicro, FunctionSignature, FunctionCheckAndCall;
+    std::string FunctionMicro, FunctionCheckAndCall;
     // Module
-    for(auto module : document.modules) {
-        std::string CurModuleName = tokenSystem[module->name];
+    for(auto &module : document->modules) {
+        std::string CurModuleName = tokenSystem[module.name];
         fprintf(pProviderHeaderFile, "class %s\n"
                                      "{\n"
                                      "public:\n", CurModuleName.c_str());
         // Api
         int apiIndex = 0;
-        for(auto api : module->apis) {
-            std::string ApiName = tokenSystem[api->name];
+        for(auto &api : module.apis) {
+            std::string ApiName = tokenSystem[api.name];
             std::string FullApiName;
             FullApiName.append(CurModuleName).append("::").append(ApiName);
 
-            fprintf(pProviderHeaderFile, "\tstatic %s %s(", GetCppType(api->retType.type).c_str(), ApiName.c_str());
+            fprintf(pProviderHeaderFile, "\tstatic %s %s(", GetCppType(api.retType.type).c_str(), ApiName.c_str());
 
             FunctionMicro.append("#define FUNCTION_").append(CurModuleName).append("_").append(ApiName).append(" ").append(std::to_string(apiIndex++)).append(1,'\n');
-            FunctionSignature.append("\t{ FUNCTION_").append(CurModuleName).append("_").append(ApiName).append(", std::string({");
             FunctionCheckAndCall.append("\t\t\tcase HashStringToInt(\"").append(FullApiName).append("\"): {\n\t\t\t\t");
-            FunctionCheckAndCall.append("CHECK_PARAM_COUNT(").append(std::to_string(api->params.size())).append(");\n");
-            FunctionCheckAndCall.append("\t\t\t\tCHECK_PARAM_SIGNATURE(").append(CurModuleName).append(", ").append(ApiName).append(");\n\t\t\t\tJson::Value param = root[\"params\"];\n\t\t\t\t");
-            if(api->retType.type != TY_void) {
+            FunctionCheckAndCall.append("CHECK_PARAM_COUNT(").append(std::to_string(api.params.size())).append(");\n");
+            FunctionCheckAndCall.append("// #@{Arguments Type Check}@#\n\t\t\t\t");
+            if(api.retType.type != TY_void) {
                 FunctionCheckAndCall.append("ret[\"return\"] = ");
             }
             FunctionCheckAndCall.append(FullApiName).append("(");
             // Params
             int paramIndex = 0;
-            for(auto param : api->params) {
-                fprintf(pProviderHeaderFile, "%s %s,", GetCppType(param->type.type).c_str(), tokenSystem[param->name].c_str());
-
-                FunctionSignature.append("ti2c[").append(GetEnumName(param->type.type)).append("], ");
-                FunctionCheckAndCall.append("param[").append(std::to_string(paramIndex++)).append("].").append(GetJsonAsMethod(param->type.type)).append("(), ");
+            std::string CheckParaments = "";
+            for(auto &param : api.params) {
+                fprintf(pProviderHeaderFile, "%s %s,", GetCppType(param.type.type).c_str(), tokenSystem[param.name].c_str());
+                CheckParaments.append("param[").append(std::to_string(paramIndex)).append("].").append(GetJsonCheckMethod(param.type.type)).append("() && ");
+                FunctionCheckAndCall.append("param[").append(std::to_string(paramIndex)).append("].").append(
+                        GetJsonConvertMethod(param.type.type)).append("(), ");
+                paramIndex++;
             }
-            if(!api->params.empty()) {
+            if(!api.params.empty()) {
                 fseek(pProviderHeaderFile, -1, SEEK_CUR);
-                FunctionSignature.erase(FunctionSignature.end() - 2, FunctionSignature.end());
                 FunctionCheckAndCall.erase(FunctionCheckAndCall.end() - 2, FunctionCheckAndCall.end());
+                CheckParaments.insert(0, "\t\t\t\tif (!(");
+                CheckParaments.erase(CheckParaments.end() - 4, CheckParaments.end());
+                CheckParaments.append(")) {\n\t\t\t\t\tFAILED(\"Arguments type check error.\");\n\t\t\t\t}\n");
             }
+            substring_replace(FunctionCheckAndCall, "// #@{Arguments Type Check}@#\n", CheckParaments);
             fprintf(pProviderHeaderFile, ");\n");
-            FunctionSignature.append("}) },\n");
             FunctionCheckAndCall.append(");\n\t\t\t\tbreak;\n\t\t\t}\n");
         }
         fprintf(pProviderHeaderFile, "};");
     }
     substring_replace(ProviderTplFile, "// #@{FUNCTION_XXX micro}@#", FunctionMicro);
-    substring_replace(ProviderTplFile, "// #@{Function Signature}@#", FunctionSignature);
     substring_replace(ProviderTplFile, "// #@{Function Check and Call}@#", FunctionCheckAndCall);
+    substring_replace(ProviderTplFile, "// #@{FTRPC Provider Head File}@#", std::string("#include \"") + head_file_name + "\"");
 
     fprintf(pProviderSrcFile, "/*\n"
                               " * Auto generate by ftrpc\n"
@@ -124,13 +128,14 @@ bool GenerateCPP_Provider(struct RootNode &document, TokenManage &tokenSystem, T
     return true;
 }
 
-bool GenerateCPP_Caller(struct RootNode &document, TokenManage &tokenSystem, TypeManage &typeSystem)
+bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem)
 {
-    const char *head_file_name = "ftrpc.caller.v" PROGRAM_VERSION_STR ".h";
-    const char *src_file_name  = "ftrpc.caller.v" PROGRAM_VERSION_STR ".cpp";
+    char head_file_name[32], src_file_name[32];
+    sprintf(head_file_name, "ftrpc.caller%s.h", hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
+    sprintf(src_file_name, "ftrpc.caller%s.cpp", hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
 
     FILE *pCallerHeaderFile = OpenHeadToWrite(head_file_name);
-    fprintf(pCallerHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document.version);
+    fprintf(pCallerHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document->version);
     fprintf(pCallerHeaderFile, "\n#include <string>\n\n");
 
     FILE *pCallerSrcFile = fopen(src_file_name, "w+");
@@ -139,15 +144,15 @@ bool GenerateCPP_Caller(struct RootNode &document, TokenManage &tokenSystem, Typ
     std::string FunctionWithCallBack;
 
     // Module
-    for(auto module : document.modules) {
-        std::string CurModuleName = tokenSystem[module->name];
+    for(auto &module : document->modules) {
+        std::string CurModuleName = tokenSystem[module.name];
         fprintf(pCallerHeaderFile, "class %s\n"
                                    "{\n"
                                    "public:\n", CurModuleName.c_str());
         // Api
         int apiIndex = 0;
-        for(auto api : module->apis) {
-            std::string ApiName = tokenSystem[api->name];
+        for(auto &api : module.apis) {
+            std::string ApiName = tokenSystem[api.name];
             fprintf(pCallerHeaderFile, "\tstatic std::string %s(", ApiName.c_str());
             std::string FullApiName, FunctionParams;
             FullApiName.append(CurModuleName).append("::").append(ApiName);
@@ -155,16 +160,16 @@ bool GenerateCPP_Caller(struct RootNode &document, TokenManage &tokenSystem, Typ
             FunctionWithCallBack.append("std::string ").append(FullApiName).append("(");
             // Params
             int paramIndex = 0;
-            for(auto param : api->params) {
-                std::string paramName = tokenSystem[param->name];
-                fprintf(pCallerHeaderFile, "%s %s, ", GetCppType(param->type.type).c_str(), paramName.c_str());
-                FunctionWithCallBack.append(GetCppType(param->type.type)).append(" ").append(paramName).append(", ");
+            for(auto &param : api.params) {
+                std::string paramName = tokenSystem[param.name];
+                fprintf(pCallerHeaderFile, "%s %s, ", GetCppType(param.type.type).c_str(), paramName.c_str());
+                FunctionWithCallBack.append(GetCppType(param.type.type)).append(" ").append(paramName).append(", ");
                 FunctionParams.append("\tparams[").append(std::to_string(paramIndex)).append("] = ").append(paramName).append(";\n");
                 paramIndex++;
             }
             FunctionWithCallBack.append("void(*_callback)(");
-            if (api->retType.type == TY_void) {
-                FunctionWithCallBack.append(GetCppType(api->retType.type));
+            if (api.retType.type != TY_void) {
+                FunctionWithCallBack.append(GetCppType(api.retType.type));
             }
             FunctionWithCallBack.append("))\n{\n");
             FunctionWithCallBack.append("\tJson::Value ret;\n"
@@ -179,11 +184,12 @@ bool GenerateCPP_Caller(struct RootNode &document, TokenManage &tokenSystem, Typ
                                         "\tscmapMutex.unlock();\n"
                                         "\tRETURN;\n"
                                         "}\n\n");
-            fprintf(pCallerHeaderFile, "void(*_callback)(%s));\n", GetCppType(api->retType.type).c_str());
+            fprintf(pCallerHeaderFile, "void(*_callback)(%s));\n", GetCppType(api.retType.type).c_str());
         }
         fprintf(pCallerHeaderFile, "};");
     }
     substring_replace(CallerTplFile, "// @#{Non-blocking RPC with callback}@#", FunctionWithCallBack);
+    substring_replace(CallerTplFile, "// #@{FTRPC Caller Head File}@#", std::string("#include \"") + head_file_name + "\"");
 
     fprintf(pCallerSrcFile, "/*\n"
                             " * Auto generate by ftrpc\n"
@@ -195,7 +201,7 @@ bool GenerateCPP_Caller(struct RootNode &document, TokenManage &tokenSystem, Typ
     CloseHeadToWrite(pCallerHeaderFile, head_file_name);
 }
 
-bool GenerateCPP(struct RootNode &document, TokenManage &tokenSystem, TypeManage &typeSystem)
+bool GenerateCPP(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem)
 {
     GenerateCPP_Provider(document, tokenSystem, typeSystem);
     GenerateCPP_Caller(document, tokenSystem, typeSystem);

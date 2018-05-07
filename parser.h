@@ -5,6 +5,7 @@
 #ifndef FTRPC_PARSER_H
 #define FTRPC_PARSER_H
 
+#include <memory>
 #include "lex.h"
 #include "symman.h"
 #include "ast_tree.h"
@@ -14,18 +15,22 @@ class parse
 private:
     bool noPrint = false;
     void reportError(const char *fmt, ...);
-    bool parseDocument(struct RootNode *root);
-    bool parseModuleList(struct RootNode *root);
-    bool parseApiList(struct ModuleNode *module);
-    bool parseInOutProperty(struct ParamNode *param);
-    bool parseParament(struct ApiNode *api);
-    bool parseType(struct TypeNode *type);
+    std::unique_ptr<RootNode> parseRoot();
+    std::unique_ptr<ModuleNode> parseModule();
+    std::unique_ptr<ApiNode> parseApi();
+    std::unique_ptr<ParamNode> parseParam();
+    std::unique_ptr<TypeNode> parseType();
+    std::unique_ptr<StructNode> parseStruct();
 public:
     lex *lexer = nullptr;
     TokenManage tokenManage;
-    TypeManage typeManage;
+    TypeManage typeManage {
+#define KEYWD(K)
+#define TYPE(T) {TY_##T, TOKEN_##T},
+#include "keywords.h"
+    };
     explicit parse(const char *src);
-    struct RootNode document;
+    std::unique_ptr<RootNode> document;
     bool work();
 };
 

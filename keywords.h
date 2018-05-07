@@ -3,6 +3,7 @@
 //
 
 #ifdef TYPE
+    TYPE(struct)
     TYPE(void)
     TYPE(int)
     TYPE(string)
@@ -17,8 +18,6 @@
 #ifdef KEYWD
     KEYWD(version)
     KEYWD(module)
-    KEYWD(in)
-    KEYWD(out)
 #   undef KEYWD
 #else
 #   error You must define KEYWD() before include keywords.h

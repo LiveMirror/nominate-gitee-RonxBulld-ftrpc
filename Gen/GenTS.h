@@ -9,6 +9,6 @@
 #include "../lex.h"
 #include "GenUtils.h"
 
-bool GenerateTypeScript(struct RootNode &document, TokenManage &tokenSystem, TypeManage &typeSystem);
+bool GenerateTypeScript(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem);
 
 #endif //FTRPC_GENTS_H
