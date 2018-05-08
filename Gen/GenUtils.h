@@ -15,6 +15,7 @@ extern bool hadVersionInfo;
 
 template<typename T> bool RegistType(TypeID type, const T &JsonCheckMethod, const T &JsonParseMethod, const T &CppTypeName_Gen, const T &TypescriptTypeName_Gen);
 bool RegistType(TypeID type, const std::string &JsonCheckMethod, const std::string &JsonParseMethod, const std::string &CppTypeName_Gen, const std::string &TypescriptTypeName_Gen);
+const char *ForceConvert_CPP(enum Type T);
 std::string &GetJsonCheckMethod(enum Type T);
 std::string &GetJsonConvertMethod(enum Type T);
 std::string &GetCppType(enum Type T);

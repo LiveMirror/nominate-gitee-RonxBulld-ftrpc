@@ -26,6 +26,31 @@ unsigned int GlobalSerialIndex = 0;
 std::map<unsigned int, void *> serialCallbackMap;
 std::mutex scmapMutex;
 
+class JsonValueExtra : public Json::Value
+{
+public:
+// #@{Custom struct convert method}@#
+#ifdef CALLER_DEMO_INSIDE
+    bool isCustomStruct() {
+        if (!this->operator[]("a").isInt()) { return false; }
+        if (!this->operator[]("b").isString()) { return false;}
+        if (!this->operator[]("c").isBool()) { return false; }
+        return true;
+    }
+    struct CustomStruct asCustomStruct() {
+        if (!this->isCustomStruct()) {
+            throw std::runtime_error("Cannot parse custom struct");
+        }
+        struct CustomStruct _custom;
+        _custom.a = this->operator[]("a").asInt();
+        _custom.b = this->operator[]("b").asString();
+        _custom.c = this->operator[]("c").asBool();
+        return _custom;
+    }
+#endif
+    JsonValueExtra(const Json::Value &jvalue) : Json::Value(jvalue) { }
+};
+
 // @#{Non-blocking RPC with callback}@#
 #ifdef PROVIDER_DEMO_INSIDE
 std::string Test::request(std::string req, void(*_callback)(void))

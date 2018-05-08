@@ -38,6 +38,13 @@ struct Custom
     int a;
     std::string b;
     bool c;
+    operator Json::Value() {
+        Json::Value _value;
+        _value["a"] = a;
+        _value["b"] = b;
+        _value["c"] = c;
+        return _value;
+    }
 };
 #endif
 
@@ -52,11 +59,11 @@ public:
         if (!this->operator[]("c").isBool()) { return false; }
         return true;
     }
-    struct CustomStruct asCustomStruct() {
+    struct Custom asCustomStruct() {
         if (!this->isCustomStruct()) {
             throw std::runtime_error("Cannot parse custom struct");
         }
-        struct CustomStruct _custom;
+        struct Custom _custom;
         _custom.a = this->operator[]("a").asInt();
         _custom.b = this->operator[]("b").asString();
         _custom.c = this->operator[]("c").asBool();
@@ -88,7 +95,7 @@ std::string ProviderDoCall(const std::string &JSON)
         ret["serial"] = serial;
         std::string funcName = root["funcName"].asString();
         int paramCount = -1;
-        JsonValueExtra param = root["params"];
+        Json::Value param = root["params"];
         if(param.isArray()) {
             paramCount = param.size();
         }

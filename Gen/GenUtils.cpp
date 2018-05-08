@@ -42,6 +42,28 @@ std::string &GetJsonConvertMethod(enum Type T) { return typeMap[T][JsonParseMeth
 std::string &GetCppType(enum Type T)           { return typeMap[T][CppTypeName_Gen]; }
 std::string &GetTsType(enum Type T)            { return typeMap[T][TypescriptTypeName_Gen]; }
 
+bool isBaseType(enum Type T) {
+    switch (T)
+    {
+        case TY_string:
+        case TY_bool:
+        case TY_void:
+        case TY_float:
+        case TY_int:
+            return true;
+        default:
+            return false;
+    }
+}
+
+const char *ForceConvert_CPP(enum Type T) {
+    if (isBaseType(T)) {
+        return "";
+    } else {
+        return "(Json::Value)";
+    }
+}
+
 std::string ReadFileAsTxt(const std::string path) {
     std::ifstream ifs(path);
     if(!ifs.is_open()) {

@@ -63,6 +63,13 @@ std::string GenerateCPP_StructDeclare(TypeID id, TokenManage &tokenSystem, TypeM
     for (const auto[type, token] : members) {
         Structure += TabFormat + "\t" + GetCppType((enum Type) type) + " " + tokenSystem[token] + ";\n";
     }
+    Structure += TabFormat + "\toperator Json::Value() {\n"
+               + TabFormat + "\t\tJson::Value _value;\n";
+    for (const auto [type, token] : members) {
+        Structure += TabFormat + "\t\t_value[\"" + tokenSystem[token] + "\"] = " + tokenSystem[token] + ";\n";
+    }
+    Structure += TabFormat + "\t\treturn _value;\n"
+               + TabFormat + "\t}\n";
     Structure += TabFormat + "};\n";
     return Structure;
 }
@@ -75,7 +82,9 @@ std::string GenerateCPP_StructCheckConvert(TypeID id, TokenManage &tokenSystem, 
     for (const auto & [type, token] : members) {
         code += "\t\tif (!this->operator[](\"" + tokenSystem[token] + "\")." + GetJsonCheckMethod((enum Type)type) + "()) { return false; }\n";
     }
-    code += "\t\treturn true;\n\t}\n";
+    code += "\t\treturn true;\n"
+            "\t}\n";
+
     code += "\tstruct " + FullName + " as" + name + "() {\n";
     code += "\t\tif (!this->is" + name + "()) {\n"
             "\t\t\tthrow std::runtime_error(\"Cannot parse as " + FullName + "\");\n"
@@ -85,7 +94,8 @@ std::string GenerateCPP_StructCheckConvert(TypeID id, TokenManage &tokenSystem, 
     for (const auto & [type, token] : members) {
         code += "\t\t" + tempValueName + "." + tokenSystem[token] + " = this->operator[](\"" + tokenSystem[token] + "\")." + GetJsonConvertMethod((enum Type)type) + "();\n";
     }
-    code += "\t\treturn " + tempValueName + ";\n\t}\n";
+    code += "\t\treturn " + tempValueName + ";\n"
+            "\t}\n";
     return code;
 }
 
@@ -129,6 +139,7 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
             FunctionCheckAndCall.append("// #@{Arguments Type Check}@#\n\t\t\t\t");
             if(api.retType.type != TY_void) {
                 FunctionCheckAndCall.append("ret[\"return\"] = ");
+                FunctionCheckAndCall.append(ForceConvert_CPP(api.retType.type));
             }
             FunctionCheckAndCall.append(FullApiName).append("(");
             // Params
@@ -136,8 +147,8 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
             std::string CheckParaments;
             for(auto &param : api.params) {
                 fprintf(pProviderHeaderFile, "%s %s,", GetCppType(param.type.type).c_str(), tokenSystem[param.name].c_str());
-                CheckParaments.append("param[").append(std::to_string(paramIndex)).append("].").append(GetJsonCheckMethod(param.type.type)).append("() && ");
-                FunctionCheckAndCall.append("param[").append(std::to_string(paramIndex)).append("].").append(
+                CheckParaments.append("((JsonValueExtra*)(&param[").append(std::to_string(paramIndex)).append("]))->").append(GetJsonCheckMethod(param.type.type)).append("() && ");
+                FunctionCheckAndCall.append("((JsonValueExtra*)(&param[").append(std::to_string(paramIndex)).append("]))->").append(
                         GetJsonConvertMethod(param.type.type)).append("(), ");
                 paramIndex++;
             }
@@ -155,7 +166,7 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
         fprintf(pProviderHeaderFile, "};");
     }
     substring_replace(ProviderTplFile, "// #@{FUNCTION_XXX micro}@#", FunctionMicro);
-    substring_replace(ProviderTplFile, "// #@{Custom struct convert method}@#", JsonExtern);
+    substring_replace(ProviderTplFile, "// #@{Custom struct convert method}@#", JsonExtern + "// #@{Custom struct convert method}@#\n");
     substring_replace(ProviderTplFile, "// #@{Function Check and Call}@#", FunctionCheckAndCall);
     substring_replace(ProviderTplFile, "// #@{FTRPC Provider Head File}@#", std::string("#include \"") + head_file_name + "\"");
 
@@ -183,7 +194,7 @@ bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenS
     FILE *pCallerSrcFile = fopen(src_file_name, "w+");
     std::string CallerTplFile = ReadFileAsTxt(CALLER_TPL_FILE);
 
-    std::string FunctionWithCallBack;
+    std::string FunctionWithCallBack, JsonExtern;
 
     // Module
     for(auto &module : document->modules) {
@@ -195,6 +206,7 @@ bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenS
         for(auto &structure : module.structs) {
             std::string code = GenerateCPP_StructDeclare(structure.type, tokenSystem, typeSystem, 1);
             fputs(code.c_str(), pCallerHeaderFile);
+            JsonExtern += GenerateCPP_StructCheckConvert(structure.type, tokenSystem, typeSystem, CurModuleName);
         }
         // Api
         int apiIndex = 0;
@@ -211,7 +223,8 @@ bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenS
                 std::string paramName = tokenSystem[param.name];
                 fprintf(pCallerHeaderFile, "%s %s, ", GetCppType(param.type.type).c_str(), paramName.c_str());
                 FunctionWithCallBack.append(GetCppType(param.type.type)).append(" ").append(paramName).append(", ");
-                FunctionParams.append("\tparams[").append(std::to_string(paramIndex)).append("] = ").append(paramName).append(";\n");
+                FunctionParams.append("\tparams[").append(std::to_string(paramIndex)).append("] = ").append(
+                        ForceConvert_CPP(param.type.type)).append(paramName).append(";\n");
                 paramIndex++;
             }
             FunctionWithCallBack.append("void(*_callback)(");
@@ -236,6 +249,7 @@ bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenS
         fprintf(pCallerHeaderFile, "};");
     }
     substring_replace(CallerTplFile, "// @#{Non-blocking RPC with callback}@#", FunctionWithCallBack);
+    substring_replace(CallerTplFile, "// #@{Custom struct convert method}@#", JsonExtern + "// #@{Custom struct convert method}@#\n");
     substring_replace(CallerTplFile, "// #@{FTRPC Caller Head File}@#", std::string("#include \"") + head_file_name + "\"");
 
     fprintf(pCallerSrcFile, "/*\n"
