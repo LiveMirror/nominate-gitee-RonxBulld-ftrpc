@@ -23,7 +23,11 @@ private:
     std::unique_ptr<StructNode> parseStruct();
 public:
     lex *lexer = nullptr;
-    TokenManage tokenManage;
+    TokenManage tokenManage {
+#define KEYWD(K) {#K, TOKEN_##K},
+#define TYPE(T) {#T, TOKEN_##T},
+#include "keywords.h"
+    };
     TypeManage typeManage {
 #define KEYWD(K)
 #define TYPE(T) {TY_##T, TOKEN_##T},

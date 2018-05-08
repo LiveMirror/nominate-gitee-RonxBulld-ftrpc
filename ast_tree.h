@@ -67,10 +67,12 @@ class ModuleNode : public astTreeNode
 {
 public:
     std::list<ApiNode> apis;
+    std::list<StructNode> structs;
     unsigned int name = (unsigned int)-1;
     ModuleNode () {
         this->nodeType = NT_MODULE;
         this->apis.clear();
+        this->structs.clear();
     }
 };
 

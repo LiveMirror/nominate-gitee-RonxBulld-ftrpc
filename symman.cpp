@@ -4,6 +4,14 @@
 #include <exception>
 #include "symman.h"
 
+TokenManage::TokenManage(std::initializer_list<std::pair<std::string, TokenID>> initToken) {
+    for(const auto & [literal,id] : initToken) {
+        this->i2s.insert(std::make_pair(id, literal));
+        this->s2i.insert(std::make_pair(literal, id));
+        this->indexReg = id >= this->indexReg ? id + 1 : this->indexReg;
+    }
+}
+
 TokenID TokenManage::operator[](const std::string &Token) {
     if (this->s2i.find(Token) != this->s2i.end()) {
         return this->s2i[Token];
@@ -20,7 +28,6 @@ const std::string &TokenManage::operator[](const TokenID &ID) {
     }
 }
 
-
 TypeManage::TypeManage(std::initializer_list<Member> initBaseType) {
     for(auto member : initBaseType) {
         this->tk2ty.insert(std::make_pair(member.second, member.first));
@@ -30,7 +37,7 @@ TypeManage::TypeManage(std::initializer_list<Member> initBaseType) {
 }
 
 TypeID TypeManage::getTypeID(TokenID Name) {
-    if (this->tk2ty.find(Name) != this->tk2ty.end()) {
+    if (this->tk2ty.find(Name) == this->tk2ty.end()) {
         throw std::runtime_error("Referenced an undefined type.");
     }
     return this->tk2ty[Name];

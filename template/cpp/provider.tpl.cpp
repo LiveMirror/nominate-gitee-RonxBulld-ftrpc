@@ -32,7 +32,6 @@ constexpr unsigned long long int HashStringToInt(const char *str, unsigned long 
 #define FUNCTION_Test_testFunction 1
 #endif
 
-// #@{Custom struct declare}@#
 #ifdef PROVIDER_DEMO_INSIDE
 struct Custom
 {

@@ -19,6 +19,8 @@ private:
 public:
     TokenID operator[](const std::string &Token);
     const std::string &operator[](const TokenID &ID);
+    TokenManage(std::initializer_list<std::pair<std::string, TokenID>> initToken);
+    TokenManage() {}
 };
 
 typedef unsigned int TypeID;
@@ -28,11 +30,12 @@ class TypeManage
 {
 private:
     TypeID indexReg = 0;
+public:
     std::map<TokenID, TypeID> tk2ty;    // TokenID -> TypeID
     std::map<TypeID, TokenID> ty2tk;    // TypeID -> TokenID
     std::map<TypeID, MemberLists> StructsMap;    // TypeID { TypeID* }
-public:
     TypeManage(std::initializer_list<Member> initBaseType);
+    TypeManage() {}
     enum typeDefType { DeclareBase, DeclareStruct };
     void registType(TokenID Name, enum typeDefType DeclareType, MemberLists &MemberList);
     TypeID getTypeID(TokenID Name);

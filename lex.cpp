@@ -42,12 +42,12 @@ void lex::TokenConvert(struct token &Tk)
     {
         // Process keyword
         Tk.type = this->keywdMap[tmp];
-        Tk.value.i = (int)Tk.type;
+        Tk.value.token = (int)Tk.type;
     }
     else
     {
         // Process identified
-        Tk.value.string = this->tokenManage->operator[](tmp);
+        Tk.value.token = this->tokenManage->operator[](tmp);
         Tk.type = TOKEN_ID;
     }
 	delete tmp;

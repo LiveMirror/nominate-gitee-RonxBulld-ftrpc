@@ -34,6 +34,7 @@ struct token
         int i;
         StringID string;
         char c;
+        TokenID token;
     } value;
 };
 
@@ -50,9 +51,6 @@ private:
 public:
     explicit LexException(const std::string &msg) {
         this->msg = msg;
-        this->what();
-    }
-    const char* what() {
         std::cerr << this->msg << std::endl;
     }
     ~LexException() throw() {
@@ -68,7 +66,6 @@ private:
     void TokenConvert(struct token &Tk);
     void IntegerConvert(struct token &Tk);
     std::map<std::string, enum TokenEnum> keywdMap;
-//    std::map<std::string, StringID> literalMap;
     std::stack<struct token> tokenStack;
     std::stack<size_t> ptrStack;
     const char *src;

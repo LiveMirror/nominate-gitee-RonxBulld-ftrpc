@@ -5,16 +5,17 @@
 #include <tuple>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #include "GenUtils.h"
 
 /*
- * TypeID | Json Check Method |Json Parse Method | C++ Enum Name | C++ Type Name(Gen) | TypeScript Type Name(Gen)
+ * TypeID | Json Check Method |Json Parse Method | C++ Type Name(Gen) | TypeScript Type Name(Gen)
  */
 enum ColumnSerial {
     JsonCheckMethod, JsonParseMethod, CppTypeName_Gen, TypescriptTypeName_Gen
 };
-std::map<enum Type, std::tuple<std::string, std::string, std::string, std::string>> typeMap = {
+std::map<TypeID, std::vector<std::string>> typeMap = {
         {TY_string, {"isString", "asString", "std::string", "string"}},
         {TY_void,   {"isNull",   "",         "void",        "void"}},
         {TY_int,    {"isInt",    "asInt",    "int",         "number"}},
@@ -23,14 +24,23 @@ std::map<enum Type, std::tuple<std::string, std::string, std::string, std::strin
         {TY_bool,   {"isBool",   "asBool",   "bool",        "boolean"}}
 };
 
-bool RegistType(enum Type type, std::string &JsonCheckMethod, std::string &JsonParseMethod, std::string &CppTypeName_Gen, std::string &TypescriptTypeName_Gen) {
-    std::tuple<std::string, std::string, std::string, std::string> insItem{JsonCheckMethod, JsonParseMethod, CppTypeName_Gen, TypescriptTypeName_Gen};
+template<typename T>
+bool RegistType(TypeID type, const T &JsonCheckMethod, const T &JsonParseMethod, const T &CppTypeName_Gen, const T &TypescriptTypeName_Gen) {
+    std::vector<std::string> insItem{std::to_string(JsonCheckMethod),
+                                   std::to_string(JsonParseMethod),
+                                   std::to_string(CppTypeName_Gen),
+                                   std::to_string(TypescriptTypeName_Gen)
+    };
     typeMap.insert(std::make_pair(type, insItem));
 }
-std::string &GetJsonCheckMethod(enum Type T)   { return std::get<JsonCheckMethod>(typeMap[T]); }
-std::string &GetJsonConvertMethod(enum Type T) { return std::get<JsonParseMethod>(typeMap[T]); }
-std::string &GetCppType(enum Type T)           { return std::get<CppTypeName_Gen>(typeMap[T]); }
-std::string &GetTsType(enum Type T)            { return std::get<TypescriptTypeName_Gen>(typeMap[T]); }
+bool RegistType(TypeID type, const std::string &JsonCheckMethod, const std::string &JsonParseMethod, const std::string &CppTypeName_Gen, const std::string &TypescriptTypeName_Gen) {
+    std::vector<std::string> insItem{JsonCheckMethod, JsonParseMethod, CppTypeName_Gen, TypescriptTypeName_Gen};
+    typeMap.insert(std::make_pair(type, insItem));
+}
+std::string &GetJsonCheckMethod(enum Type T)   { return typeMap[T][JsonCheckMethod]; }
+std::string &GetJsonConvertMethod(enum Type T) { return typeMap[T][JsonParseMethod]; }
+std::string &GetCppType(enum Type T)           { return typeMap[T][CppTypeName_Gen]; }
+std::string &GetTsType(enum Type T)            { return typeMap[T][TypescriptTypeName_Gen]; }
 
 std::string ReadFileAsTxt(const std::string path) {
     std::ifstream ifs(path);

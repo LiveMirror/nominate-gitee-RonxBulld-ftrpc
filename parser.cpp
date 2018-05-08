@@ -21,9 +21,7 @@
 #define PUSHBACK(T) this->lexer->pushBack(T)
 #define SEE_NEXT_TOKEN(T) do { GETTOKEN(T); PUSHBACK(T); } while (0)
 #define CALL_UNTERMINAL_PARSER(unterminal) ([&](){ \
-                                                   this->lexer->pushPtr(); \
                                                    std::unique_ptr<unterminal##Node> node = this->parse##unterminal(); \
-                                                   if (node == nullptr) { this->lexer->popPtr(); } \
                                                    return node; \
                                                })()
 
@@ -46,25 +44,29 @@ void parse::reportError(const char *fmt, ...)
 }
 
 /*
- * struct : TOKEN_struct TOKEN_ID { (type TOKENID ,)* } ;
+ * struct : TOKEN_struct TOKEN_ID { (type TOKENID ;)* } ;
  */
 std::unique_ptr<StructNode> parse::parseStruct() {
     token T;
     std::unique_ptr<StructNode> structure(new StructNode());
     REQUIRE_TOKEN(T, TOKEN_struct, "Require `struct`.");
     REQUIRE_TOKEN(T, TOKEN_ID, "Anonymouse struct is not supported.");
-    structure->name = T.value.string;
+    structure->name = T.value.token;
+    REQUIRE_TOKEN(T, ':', "Require `:`.");
     REQUIRE_TOKEN(T, '{', "Require `{`.");
     SEE_NEXT_TOKEN(T);
     MemberLists members;
-    while (T.type != '}') {
-        std::unique_ptr<TypeNode> type = CALL_UNTERMINAL_PARSER(Type);
-        REQUIRE_TOKEN(T, TOKEN_ID, "Require member name after type.");
-        Member member;
-        member.first = type->type;
-        member.second = T.value.string;
-        members.push_back(member);
-        SEE_NEXT_TOKEN(T);
+    if (T.type != '}') {
+        do {
+            std::unique_ptr<TypeNode> type = CALL_UNTERMINAL_PARSER(Type);
+            REQUIRE_TOKEN(T, TOKEN_ID, "Require member name after type.");
+            Member member;
+            member.first = type->type;
+            member.second = T.value.string;
+            members.push_back(member);
+            REQUIRE_TOKEN(T, ';', "Require `;`.");
+            SEE_NEXT_TOKEN(T);
+        } while (T.type != '}');
     }
     typeManage.registType(structure->name, TypeManage::typeDefType::DeclareStruct, members);
     structure->type = (enum Type)typeManage.getTypeID(structure->name);
@@ -102,13 +104,12 @@ std::unique_ptr<TypeNode> parse::parseType()
             type->type = TY_bool;
         }
             break;
-        case TOKEN_struct: {
-            type->type = TY_struct;
-            PUSHBACK(T);
-            std::unique_ptr<StructNode> structure = CALL_UNTERMINAL_PARSER(Struct);
-            type->type = structure->type;
+        case TOKEN_ID: {
+            if (this->typeManage.isType(T.value.token)) {
+                type->type = (enum Type)this->typeManage.getTypeID(T.value.token);
+                break;
+            }
         }
-            break;
         default: {
             char tmp[T.length + 1];
             strncpy(tmp, T.literal, T.length);
@@ -163,7 +164,7 @@ std::unique_ptr<ApiNode> parse::parseApi() {
 }
 
 /*
- * module : ( TOKEN_MODULE TOKEN_ID ':' '{' api* '}' )* ;
+ * module : ( TOKEN_MODULE TOKEN_ID ':' '{' (struct|api)* '}' )* ;
  */
 std::unique_ptr<ModuleNode> parse::parseModule()
 {
@@ -176,12 +177,20 @@ std::unique_ptr<ModuleNode> parse::parseModule()
         REQUIRE_TOKEN(T, ':', "Request ':'.");
         REQUIRE_TOKEN(T, '{', "Request '{'.");
         SEE_NEXT_TOKEN(T);
-        if (typeManage.isType(T.type)) {
-            do {
-                std::unique_ptr<ApiNode> api = CALL_UNTERMINAL_PARSER(Api);
-                module->apis.push_back(*api);
+        while (true) {
+            if (T.type == TOKEN_struct) {
+                std::unique_ptr<StructNode> structure = CALL_UNTERMINAL_PARSER(Struct);
+                module->structs.push_back(*structure);
                 SEE_NEXT_TOKEN(T);
-            } while (typeManage.isType(T.type));
+            } else if (typeManage.isType(T.value.token)) {
+                do {
+                    std::unique_ptr<ApiNode> api = CALL_UNTERMINAL_PARSER(Api);
+                    module->apis.push_back(*api);
+                    SEE_NEXT_TOKEN(T);
+                } while (typeManage.isType(T.value.token));
+            } else {
+                break;
+            }
         }
         REQUIRE_TOKEN(T, '}', "Request '}'.");
     }

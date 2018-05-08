@@ -74,6 +74,11 @@ int main(int argc, char **argv) {
     std::string Su = ReadFileAsTxt(std::string(argv[argc - 1]));
     parse parser(Su.c_str());
     parser.work();
+    for (auto structure : parser.typeManage.StructsMap) {
+        TokenID token = parser.typeManage.ty2tk[structure.first];
+        std::string name = parser.tokenManage[token];
+        RegistType((enum Type)structure.first, "is"+name+"Struct", "as"+name+"Struct", "struct "+name, name);
+    }
     if (cppEnable)
         GenerateCPP(parser.document, parser.tokenManage, parser.typeManage);
     if (tsEnable)

@@ -54,6 +54,23 @@ void CloseHeadToWrite(FILE *fp, const char *fn)
     fclose(fp);
 }
 
+std::string GenerateCPP_StructDeclare(TokenManage &tokenSystem, TypeManage &typeSystem, unsigned int tabLevel = 0)
+{
+    std::string code;
+    std::string TabFormat(tabLevel, '\t');
+    for (const auto & [id,members] : typeSystem.StructsMap) {
+        std::string Structure = TabFormat;
+        std::string name = tokenSystem[typeSystem.ty2tk[id]];
+        Structure += "struct " + name + "\n{\n";
+        for (const auto [type,token] : members) {
+            Structure += TabFormat + "\t" + GetCppType((enum Type)type) + " " + tokenSystem[token] + ";\n";
+        }
+        Structure += "};\n";
+        code += Structure;
+    }
+    return code;
+}
+
 bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem)
 {
     char head_file_name[32], src_file_name[32];
@@ -73,6 +90,10 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
         fprintf(pProviderHeaderFile, "class %s\n"
                                      "{\n"
                                      "public:\n", CurModuleName.c_str());
+        // Structure
+        for(auto &structure : module.structs) {
+
+        }
         // Api
         int apiIndex = 0;
         for(auto &api : module.apis) {
@@ -137,6 +158,8 @@ bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenS
     FILE *pCallerHeaderFile = OpenHeadToWrite(head_file_name);
     fprintf(pCallerHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document->version);
     fprintf(pCallerHeaderFile, "\n#include <string>\n\n");
+    std::string StructureCode = GenerateCPP_StructDeclare(tokenSystem, typeSystem);
+    fprintf(pCallerHeaderFile, "%s", StructureCode.c_str());
 
     FILE *pCallerSrcFile = fopen(src_file_name, "w+");
     std::string CallerTplFile = ReadFileAsTxt(CALLER_TPL_FILE);

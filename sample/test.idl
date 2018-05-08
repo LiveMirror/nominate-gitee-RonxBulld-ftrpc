@@ -1,6 +1,13 @@
 version = 1;
 module Test:
 {
+    struct CustomStruct:
+    {
+        int a;
+        float b;
+        string c;
+        bool d;
+    };
 	void request(string req, int tz, bool flag);
 	string requireNewStockInfo();
 };
