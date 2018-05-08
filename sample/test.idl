@@ -1,7 +1,7 @@
 version = 1;
 module Test:
 {
-    struct CustomStruct:
+    struct Custom:
     {
         int a;
         float b;

@@ -52,11 +52,11 @@ public:
         if (!this->operator[]("c").isBool()) { return false; }
         return true;
     }
-    struct Custom asCustomStruct() {
+    struct CustomStruct asCustomStruct() {
         if (!this->isCustomStruct()) {
             throw std::runtime_error("Cannot parse custom struct");
         }
-        struct Custom _custom;
+        struct CustomStruct _custom;
         _custom.a = this->operator[]("a").asInt();
         _custom.b = this->operator[]("b").asString();
         _custom.c = this->operator[]("c").asBool();
