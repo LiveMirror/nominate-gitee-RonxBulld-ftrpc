@@ -14,18 +14,36 @@
 // #define PROVIDER_TPL_FILE "./template/typescript/provider.tpl.ts"
 #define CALLER_TPL_FILE "./template/typescript/caller.tpl.ts"
 
+std::string GenerateTypeScript_StructDeclare(TypeID id, TokenManage &tokenSystem, TypeManage &typeSystem, unsigned int tabLevel = 0) {
+    std::string TabFormat(tabLevel, '\t');
+    auto &members = typeSystem.StructsMap[id];
+    std::string Structure = TabFormat;
+    std::string name = tokenSystem[typeSystem.ty2tk[id]];
+    Structure += "export class " + name + " {\n";
+    for (const auto [type,token] : members) {
+        Structure += TabFormat + "\t" + tokenSystem[token] + ": " + GetTsType((enum Type) type) + ";\n";
+    }
+    Structure += TabFormat + "}\n";
+    return Structure;
+}
+
 bool GenerateTypeScript_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem) {
     char ts_file_name[32];
     sprintf(ts_file_name, "ftrpc.caller%s.ts", hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
     std::string CallerTplFile = ReadFileAsTxt(CALLER_TPL_FILE);
-    std::string FunctionWithCallBack;
+    std::string ModuleDefine;
     std::string VersionString("\nlet version: number = ");
     VersionString.append(std::to_string(document->version)).append(";\n");
     CallerTplFile.insert(0, VersionString);
     // Module
     for(auto &module : document->modules) {
         std::string CurModuleName = tokenSystem[module.name];
-        FunctionWithCallBack.append("export class ").append(CurModuleName).append(" {\n");
+        ModuleDefine.append("export module ").append(CurModuleName).append(" {\n");
+        // Structure
+        for (auto & structure : module.structs) {
+            std::string code = GenerateTypeScript_StructDeclare(structure.type, tokenSystem, typeSystem, 1);
+            ModuleDefine += code;
+        }
         // Api
         int apiIndex = 0;
         for(auto &api : module.apis) {
@@ -33,41 +51,41 @@ bool GenerateTypeScript_Caller(std::unique_ptr<RootNode> &document, TokenManage 
             std::string FullApiName, FunctionParams;
             FullApiName.append(CurModuleName).append("::").append(ApiName);
             // Params
-            FunctionWithCallBack.append("\tpublic static ").append(ApiName).append("(");
+            ModuleDefine.append("\texport function ").append(ApiName).append("(");
             int paramIndex = 0;
             for(auto &param : api.params) {
                 std::string paramName = tokenSystem[param.name];
-                FunctionWithCallBack.append(paramName).append(": ").append(GetTsType(param.type.type)).append(", ");
+                ModuleDefine.append(paramName).append(": ").append(GetTsType(param.type.type)).append(", ");
                 FunctionParams.append(paramName).append(", ");
                 paramIndex++;
             }
             if (!api.params.empty()) {
                 FunctionParams.erase(FunctionParams.end() - 2, FunctionParams.end());
             }
-            FunctionWithCallBack.append("_callback: (");
+            ModuleDefine.append("_callback: (");
             if (api.retType.type != TY_void) {
-                FunctionWithCallBack.append("RetValue: ").append(GetTsType(api.retType.type));
+                ModuleDefine.append("RetValue: ").append(GetTsType(api.retType.type));
             }
-            FunctionWithCallBack.append(") => void): string {\n");
-            FunctionWithCallBack.append("\t\tlet thisSerial = ftrpc_caller.serial++;\n");
-            FunctionWithCallBack.append("\t\tlet reqStruct: rpcPack = {\n"
+            ModuleDefine.append(") => void): string {\n");
+            ModuleDefine.append("\t\tlet thisSerial = ftrpc_caller.serial++;\n");
+            ModuleDefine.append("\t\tlet reqStruct: rpcPack = {\n"
                                         "\t\t\ttype: \"rpc\",\n");
-            FunctionWithCallBack.append("\t\t\tversion: ").append(std::to_string(document->version)).append(",\n");
-            FunctionWithCallBack.append("\t\t\tserial: thisSerial,\n"
+            ModuleDefine.append("\t\t\tversion: ").append(std::to_string(document->version)).append(",\n");
+            ModuleDefine.append("\t\t\tserial: thisSerial,\n"
                                         "\t\t\tfuncName: \"").append(FullApiName).append("\",\n");
-            FunctionWithCallBack.append("\t\t\tparams: [").append(FunctionParams).append("],\n");
-            FunctionWithCallBack.append("\t\t};\n");
+            ModuleDefine.append("\t\t\tparams: [").append(FunctionParams).append("],\n");
+            ModuleDefine.append("\t\t};\n");
             if (api.retType.type ==  TY_void) {
-                FunctionWithCallBack.append("\t\tftrpc_caller.callbackMap_noret[thisSerial] = _callback;\n");
+                ModuleDefine.append("\t\tftrpc_caller.callbackMap_noret[thisSerial] = _callback;\n");
             } else {
-                FunctionWithCallBack.append("\t\tftrpc_caller.callbackMap[thisSerial] = _callback;\n");
+                ModuleDefine.append("\t\tftrpc_caller.callbackMap[thisSerial] = _callback;\n");
             }
-            FunctionWithCallBack.append("\t\treturn JSON.stringify(reqStruct);\n"
+            ModuleDefine.append("\t\treturn JSON.stringify(reqStruct);\n"
                                         "\t}\n");
         }
-        FunctionWithCallBack.append("}\n\n");
+        ModuleDefine.append("}\n\n");
     }
-    substring_replace(CallerTplFile, "// #@{Non-blocking RPC with callback}@#", FunctionWithCallBack);
+    substring_replace(CallerTplFile, "// #@{Non-blocking RPC with callback}@#", ModuleDefine);
     static const char *HeadText = "/*\n"
                                   " * Auto generate by ftrpc\n"
                                   " * Created by Rexfield on 2018/5/2\n"

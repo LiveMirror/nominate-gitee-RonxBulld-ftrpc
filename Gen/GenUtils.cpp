@@ -20,7 +20,7 @@ std::map<TypeID, std::vector<std::string>> typeMap = {
         {TY_void,   {"isNull",   "",         "void",        "void"}},
         {TY_int,    {"isInt",    "asInt",    "int",         "number"}},
         {TY_any,    {"isObject", "",         "void*",       "any"}},
-        {TY_float,  {"isDouble", "asFloat",  "float",       "float"}},
+        {TY_float,  {"isDouble", "asFloat",  "float",       "number"}},
         {TY_bool,   {"isBool",   "asBool",   "bool",        "boolean"}}
 };
 

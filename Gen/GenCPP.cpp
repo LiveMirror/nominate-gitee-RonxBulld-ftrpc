@@ -78,15 +78,15 @@ std::string GenerateCPP_StructCheckConvert(TypeID id, TokenManage &tokenSystem, 
     std::string name = tokenSystem[typeSystem.ty2tk[id]];
     std::string FullName = FieldName + "::" + name;
     auto &members = typeSystem.StructsMap[id];
-    std::string code = "\tbool is" + name + "() {\n";
+    std::string code = "\tbool is" + name + "Struct() {\n";
     for (const auto & [type, token] : members) {
         code += "\t\tif (!this->operator[](\"" + tokenSystem[token] + "\")." + GetJsonCheckMethod((enum Type)type) + "()) { return false; }\n";
     }
     code += "\t\treturn true;\n"
             "\t}\n";
 
-    code += "\tstruct " + FullName + " as" + name + "() {\n";
-    code += "\t\tif (!this->is" + name + "()) {\n"
+    code += "\tstruct " + FullName + " as" + name + "Struct() {\n";
+    code += "\t\tif (!this->is" + name + "Struct()) {\n"
             "\t\t\tthrow std::runtime_error(\"Cannot parse as " + FullName + "\");\n"
             "\t\t}\n";
     std::string tempValueName = "__Tmp_" + name + "__";
@@ -107,7 +107,8 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
 
     FILE *pProviderHeaderFile = OpenHeadToWrite(head_file_name);
     fprintf(pProviderHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document->version);
-    fprintf(pProviderHeaderFile, "\n#include <string>\n\n"
+    fprintf(pProviderHeaderFile, "\n#include <string>\n"
+                                 "#include \"json/json.h\"\n\n"
                                  "std::string ProviderDoCall(const std::string &JSON);\n\n");
     FILE *pProviderSrcFile = fopen(src_file_name, "w+");
     std::string ProviderTplFile = ReadFileAsTxt(PROVIDER_TPL_FILE);
@@ -189,7 +190,8 @@ bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenS
 
     FILE *pCallerHeaderFile = OpenHeadToWrite(head_file_name);
     fprintf(pCallerHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document->version);
-    fprintf(pCallerHeaderFile, "\n#include <string>\n\n");
+    fprintf(pCallerHeaderFile, "\n#include <string>\n"
+                               "#include \"json/json.h\"\n\n");
 
     FILE *pCallerSrcFile = fopen(src_file_name, "w+");
     std::string CallerTplFile = ReadFileAsTxt(CALLER_TPL_FILE);
