@@ -25,7 +25,7 @@ ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
     add_custom_target(CopyTask ALL DEPENDS copy_res)
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "Windows")
 
-add_executable(ftrpc main.cpp
+add_executable(ftrpc main.cpp json_export.h
         lex.cpp lex.h keywords.h parser.cpp parser.h ast_tree.h TypeDef.h symman.cpp symman.h
         jsoncpp.cpp Gen/GenCPP.cpp Gen/GenCPP.h Gen/GenUtils.cpp Gen/GenUtils.h Gen/GenTS.cpp Gen/GenTS.h
         copy_res)
