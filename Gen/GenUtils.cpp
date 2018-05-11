@@ -85,16 +85,22 @@ std::string ReadFileAsTxt(const std::string path) {
     return ReadFileAsTxt(path.c_str());
 }
 
-#ifdef _WIN32_WINNT
+#if _WIN32_WINNT || _WIN32 || _WIN || MSVC
 #include <windows.h>
+#define GETEXEPATH GetModuleFileName(nullptr, szFilePath, MAX_PATH)
+#else
+#include <unistd.h>
+#define MAX_PATH _MAX_PATH
+#define GETEXEPATH readlink("/proc/self/exe", szFilePath, MAX_PATH)
+#endif
 std::string ReadTemplate(const std::string path) {
     char szFilePath[MAX_PATH + 1]={0};
-    GetModuleFileName(nullptr, szFilePath, MAX_PATH);
+    GETEXEPATH;
     (strrchr(szFilePath, '\\'))[1] = 0;
     strcat(szFilePath, path.c_str());
     return ReadFileAsTxt(szFilePath);
 }
-#endif
+#undef GETEXEPATH
 
 void substring_replace(std::string &str,const std::string &oldstr,const std::string &newstr) {
     std::string::size_type pos=0;
