@@ -30,7 +30,7 @@ std::string GenerateTypeScript_StructDeclare(TypeID id, TokenManage &tokenSystem
 bool GenerateTypeScript_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem) {
     char ts_file_name[32];
     sprintf(ts_file_name, "ftrpc.caller%s.ts", hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
-    std::string CallerTplFile = ReadFileAsTxt(CALLER_TPL_FILE);
+    std::string CallerTplFile = ReadTemplate(CALLER_TPL_FILE);
     std::string ModuleDefine;
     std::string VersionString("\nlet version: number = ");
     VersionString.append(std::to_string(document->version)).append(";\n");

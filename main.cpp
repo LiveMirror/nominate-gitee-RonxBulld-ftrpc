@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
     if (jsEnable) fprintf(stdout, "javascript ");
     if (tsEnable) fprintf(stdout, "typescript ");
     fprintf(stdout, "\n");
-    std::string Su = ReadFileAsTxt(std::string(argv[argc - 1]));
+    std::string Su = ReadFileAsTxt(argv[argc - 1]);
     parse parser(Su.c_str());
     parser.work();
     for (auto structure : parser.typeManage.StructsMap) {

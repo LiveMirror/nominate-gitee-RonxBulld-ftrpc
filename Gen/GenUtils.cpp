@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <stdio.h>
 
 #include "GenUtils.h"
 
@@ -64,21 +65,36 @@ const char *ForceConvert_CPP(enum Type T) {
     }
 }
 
-std::string ReadFileAsTxt(const std::string path) {
-    std::ifstream ifs(path);
-    if(!ifs.is_open()) {
+std::string ReadFileAsTxt(const char *path) {
+    FILE *fp = fopen(path, "r");
+    if (fp == nullptr) {
+        std::cerr << "No such file or directory - " << path << std::endl;
         throw std::invalid_argument(path);
     }
-    std::string s;
-    while(!ifs.eof()) {
-        std::string tmp;
-        std::getline(ifs, tmp);
-        s.push_back('\n');
-        s.append(tmp);
-    }
-    ifs.close();
+    fseek(fp, 0, SEEK_END);
+    long len = ftell(fp);
+    auto mem = (char *)malloc(len * sizeof(char));
+    fseek(fp, 0, SEEK_SET);
+    fread(mem, 1, (size_t )len, fp);
+    std::string s(mem);
+    free(mem);
     return s;
 }
+
+std::string ReadFileAsTxt(const std::string path) {
+    return ReadFileAsTxt(path.c_str());
+}
+
+#ifdef _WIN32_WINNT
+#include <windows.h>
+std::string ReadTemplate(const std::string path) {
+    char szFilePath[MAX_PATH + 1]={0};
+    GetModuleFileName(nullptr, szFilePath, MAX_PATH);
+    (strrchr(szFilePath, '\\'))[1] = 0;
+    strcat(szFilePath, path.c_str());
+    return ReadFileAsTxt(szFilePath);
+}
+#endif
 
 void substring_replace(std::string &str,const std::string &oldstr,const std::string &newstr) {
     std::string::size_type pos=0;

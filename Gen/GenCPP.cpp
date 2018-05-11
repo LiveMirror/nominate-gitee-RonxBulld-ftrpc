@@ -66,7 +66,7 @@ std::string GenerateCPP_StructDeclare(TypeID id, TokenManage &tokenSystem, TypeM
     Structure += TabFormat + "\texplicit operator Json::Value() {\n"
                + TabFormat + "\t\tJson::Value _value;\n";
     for (const auto [type, token] : members) {
-        Structure += TabFormat + "\t\t_value[\"" + tokenSystem[token] + "\"] = " + tokenSystem[token] + ";\n";
+        Structure += TabFormat + "\t\t_value[\"" + tokenSystem[token] + "\"] = " + ForceConvert_CPP((enum Type)type) + tokenSystem[token] + ";\n";
     }
     Structure += TabFormat + "\t\treturn _value;\n"
                + TabFormat + "\t}\n";
@@ -111,7 +111,7 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
                                  "#include \"json/json.h\"\n\n"
                                  "std::string ProviderDoCall(const std::string &JSON);\n\n");
     FILE *pProviderSrcFile = fopen(src_file_name, "w+");
-    std::string ProviderTplFile = ReadFileAsTxt(PROVIDER_TPL_FILE);
+    std::string ProviderTplFile = ReadTemplate(PROVIDER_TPL_FILE);
     std::string FunctionMicro, FunctionCheckAndCall, JsonExtern;
     // Module
     for(auto &module : document->modules) {
@@ -194,7 +194,7 @@ bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenS
                                "#include \"json/json.h\"\n\n");
 
     FILE *pCallerSrcFile = fopen(src_file_name, "w+");
-    std::string CallerTplFile = ReadFileAsTxt(CALLER_TPL_FILE);
+    std::string CallerTplFile = ReadTemplate(CALLER_TPL_FILE);
 
     std::string FunctionWithCallBack, JsonExtern;
 

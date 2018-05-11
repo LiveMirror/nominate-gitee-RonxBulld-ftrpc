@@ -13,6 +13,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="722d8a2b-917c-4f61-a242-bbe8d178132d" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Gen/GenCPP.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Gen/GenCPP.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Gen/GenTS.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Gen/GenTS.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Gen/GenUtils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Gen/GenUtils.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Gen/GenUtils.h" beforeDir="false" afterPath="$PROJECT_DIR$/Gen/GenUtils.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
@@ -26,11 +31,11 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="main.cpp" pinned="false" current-in-tab="false">
+      <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="334">
-              <caret line="19" column="96" selection-start-line="19" selection-start-column="96" selection-end-line="19" selection-end-column="96" />
+            <state relative-caret-position="376">
+              <caret line="85" column="26" selection-start-line="85" selection-start-column="26" selection-end-line="85" selection-end-column="26" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
               </folding>
@@ -38,11 +43,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test.idl" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/sample/test.idl">
+      <file leaf-file-name="parser.cpp" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/parser.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="325">
-              <caret line="13" column="2" lean-forward="true" selection-start-line="13" selection-start-column="2" selection-end-line="13" selection-end-column="2" />
+            <state relative-caret-position="226">
+              <caret line="71" selection-start-line="71" selection-end-line="71" />
             </state>
           </provider>
         </entry>
@@ -50,8 +55,8 @@
       <file leaf-file-name="GenCPP.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Gen/GenCPP.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1532">
-              <caret line="113" column="43" selection-start-line="113" selection-start-column="43" selection-end-line="113" selection-end-column="43" />
+            <state relative-caret-position="234">
+              <caret line="196" column="44" selection-start-line="196" selection-start-column="44" selection-end-line="196" selection-end-column="44" />
               <folding>
                 <element signature="e#43#57#0" expanded="true" />
               </folding>
@@ -62,8 +67,8 @@
       <file leaf-file-name="GenTS.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Gen/GenTS.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1775">
-              <caret line="71" column="50" selection-start-line="71" selection-start-column="50" selection-end-line="71" selection-end-column="50" />
+            <state relative-caret-position="234">
+              <caret line="32" column="44" selection-start-line="32" selection-start-column="44" selection-end-line="32" selection-end-column="44" />
             </state>
           </provider>
         </entry>
@@ -71,20 +76,21 @@
       <file leaf-file-name="GenUtils.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Gen/GenUtils.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1650">
-              <caret line="66" column="19" selection-start-line="66" selection-start-column="19" selection-end-line="66" selection-end-column="19" />
+            <state relative-caret-position="505">
+              <caret line="96" column="6" lean-forward="true" selection-start-line="96" selection-start-column="6" selection-end-line="96" selection-end-column="6" />
               <folding>
+                <element signature="e#42#56#0" expanded="true" />
                 <element signature="e#855#867#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="caller.tpl.ts" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/template/typescript/caller.tpl.ts">
+      <file leaf-file-name="GenUtils.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Gen/GenUtils.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="350">
-              <caret line="14" column="1" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="1" />
+            <state relative-caret-position="479">
+              <caret line="24" selection-start-line="24" selection-end-line="24" selection-end-column="48" />
             </state>
           </provider>
         </entry>
@@ -122,18 +128,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="symman.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/symman.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1475">
-              <caret line="59" selection-start-line="59" selection-end-line="59" />
-              <folding>
-                <element signature="e#42#62#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
     </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
@@ -145,7 +139,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>writer</find>
       <find>strdup</find>
       <find>typeMap</find>
       <find>serialCallbackMap</find>
@@ -175,6 +168,7 @@
       <find>ForceConvert_CPP</find>
       <find>Custom struct convert method</find>
       <find>Json::Value</find>
+      <find>read</find>
     </findStrings>
     <replaceStrings>
       <replace>'</replace>
@@ -221,13 +215,13 @@
         <option value="$PROJECT_DIR$/parser.cpp" />
         <option value="$PROJECT_DIR$/template/cpp/caller.tpl.cpp" />
         <option value="$PROJECT_DIR$/template/cpp/provider.tpl.cpp" />
-        <option value="$PROJECT_DIR$/Gen/GenUtils.h" />
         <option value="$PROJECT_DIR$/sample/test.idl" />
         <option value="$PROJECT_DIR$/template/typescript/caller.tpl.ts" />
-        <option value="$PROJECT_DIR$/Gen/GenTS.cpp" />
-        <option value="$PROJECT_DIR$/Gen/GenCPP.cpp" />
-        <option value="$PROJECT_DIR$/Gen/GenUtils.cpp" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/Gen/GenUtils.h" />
+        <option value="$PROJECT_DIR$/Gen/GenCPP.cpp" />
+        <option value="$PROJECT_DIR$/Gen/GenTS.cpp" />
+        <option value="$PROJECT_DIR$/Gen/GenUtils.cpp" />
         <option value="$PROJECT_DIR$/main.cpp" />
       </list>
     </option>
@@ -325,7 +319,7 @@
     </option>
   </component>
   <component name="RunManager" selected="Application.Build All">
-    <configuration name="Build All" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-o c++,ts test.idl --no-version --builtin-json" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ftrpc" RUN_TARGET_NAME="ftrpc" EXPLICIT_BUILD_TARGET_NAME="all" />
+    <configuration name="Build All" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-o c++,ts D:\Project\UnionApp\RPC\unirpc.idl --no-version --builtin-json" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ftrpc" RUN_TARGET_NAME="ftrpc" EXPLICIT_BUILD_TARGET_NAME="all" />
     <configuration name="CopyTask" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ftrpc" TARGET_NAME="CopyTask" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ftrpc" RUN_TARGET_NAME="ftrpc" />
     <configuration name="ftrpc" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ftrpc" TARGET_NAME="ftrpc" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ftrpc" RUN_TARGET_NAME="ftrpc" />
     <list>
@@ -372,6 +366,7 @@
       <workItem from="1525932583208" duration="144000" />
       <workItem from="1525959384944" duration="5197000" />
       <workItem from="1526004196467" duration="2455000" />
+      <workItem from="1526021193459" duration="4777000" />
     </task>
     <task id="LOCAL-00001" summary="调整目录结构，将模板文件独立出来">
       <created>1525227385187</created>
@@ -384,22 +379,23 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="253933000" />
+    <option name="totallyTimeSpent" value="258710000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.115911484" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.115911484" />
       <window_info anchor="bottom" id="TODO" order="7" />
-      <window_info anchor="bottom" id="Messages" order="8" visible="true" weight="0.20585048" />
+      <window_info anchor="bottom" id="Messages" order="8" sideWeight="0.49894625" weight="0.20585048" />
       <window_info anchor="bottom" id="CMake" order="12" weight="0.2281407" />
-      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50105375" side_tool="true" weight="0.20585048" />
       <window_info anchor="bottom" id="Version Control" order="11" weight="0.32936078" />
-      <window_info anchor="bottom" id="Run" order="3" weight="0.18090452" />
+      <window_info anchor="bottom" id="Run" order="3" weight="0.17984831" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="9" weight="0.3286432" />
+      <window_info anchor="bottom" id="Terminal" order="9" weight="0.32827735" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Debug" order="4" weight="0.30351758" />
+      <window_info active="true" anchor="bottom" id="Debug" order="4" visible="true" weight="0.3033586" />
       <window_info anchor="bottom" id="TypeScript" order="7" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="6" weight="0.4" />
@@ -428,7 +424,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="100" />
+      <option name="time" value="105" />
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
@@ -488,13 +484,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="675">
-          <caret line="27" column="43" selection-start-line="27" selection-start-column="43" selection-end-line="27" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/symman.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1475">
@@ -635,13 +624,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://D:/DevCol/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/ext/new_allocator.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="135" selection-start-line="135" selection-end-line="135" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://D:/DevCol/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/bits/alloc_traits.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="220">
@@ -705,13 +687,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/parser.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3458">
-          <caret line="182" column="46" selection-start-line="182" selection-start-column="46" selection-end-line="182" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/symman.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1475">
@@ -722,24 +697,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Gen/GenUtils.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="18" column="42" selection-start-line="18" selection-start-column="42" selection-end-line="18" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/template/typescript/caller.tpl.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="350">
           <caret line="14" column="1" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Gen/GenTS.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1775">
-          <caret line="71" column="50" selection-start-line="71" selection-start-column="50" selection-end-line="71" selection-end-column="50" />
         </state>
       </provider>
     </entry>
@@ -760,16 +721,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Gen/GenUtils.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1650">
-          <caret line="66" column="19" selection-start-line="66" selection-start-column="19" selection-end-line="66" selection-end-column="19" />
-          <folding>
-            <element signature="e#855#867#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/template/cpp/caller.tpl.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="549">
@@ -787,30 +738,76 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.cpp">
+    <entry file="file://$PROJECT_DIR$/sample/test.idl">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="334">
-          <caret line="19" column="96" selection-start-line="19" selection-start-column="96" selection-end-line="19" selection-end-column="96" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="325">
+          <caret line="13" column="2" lean-forward="true" selection-start-line="13" selection-start-column="2" selection-end-line="13" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/DevCol/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/ext/new_allocator.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="220">
+          <caret line="135" selection-start-line="135" selection-end-line="135" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/parser.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="226">
+          <caret line="71" selection-start-line="71" selection-end-line="71" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Gen/GenCPP.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1532">
-          <caret line="113" column="43" selection-start-line="113" selection-start-column="43" selection-end-line="113" selection-end-column="43" />
+        <state relative-caret-position="234">
+          <caret line="196" column="44" selection-start-line="196" selection-start-column="44" selection-end-line="196" selection-end-column="44" />
           <folding>
             <element signature="e#43#57#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/sample/test.idl">
+    <entry file="file://$PROJECT_DIR$/Gen/GenTS.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="325">
-          <caret line="13" column="2" lean-forward="true" selection-start-line="13" selection-start-column="2" selection-end-line="13" selection-end-column="2" />
+        <state relative-caret-position="234">
+          <caret line="32" column="44" selection-start-line="32" selection-start-column="44" selection-end-line="32" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/DevCol/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/x86_64-w64-mingw32/include/unistd.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="429">
+          <caret line="104" column="17" selection-start-line="104" selection-start-column="13" selection-end-line="104" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Gen/GenUtils.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="479">
+          <caret line="24" selection-start-line="24" selection-end-line="24" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Gen/GenUtils.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="505">
+          <caret line="96" column="6" lean-forward="true" selection-start-line="96" selection-start-column="6" selection-end-line="96" selection-end-column="6" />
+          <folding>
+            <element signature="e#42#56#0" expanded="true" />
+            <element signature="e#855#867#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="376">
+          <caret line="85" column="26" selection-start-line="85" selection-start-column="26" selection-end-line="85" selection-end-column="26" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
