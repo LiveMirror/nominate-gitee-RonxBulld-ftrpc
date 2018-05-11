@@ -101,7 +101,8 @@ int main(int argc, char **argv) {
             WRITE_JSON_FILE("json/json-forwards.h", json_json_forwards_h);
         }
     }
-    if (tsEnable)
+    if (tsEnable) {
         GenerateTypeScript(parser.document, parser.tokenManage, parser.typeManage);
+    }
     return 0;
 }
