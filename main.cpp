@@ -17,7 +17,7 @@ bool cppEnable = false, pyEnable = false, jsEnable = false, tsEnable = false, bu
 bool hadVersionInfo = true;
 
 void help() {
-    fprintf(stdout, "\nUsage: ftrpc [--help|-h] [--no-version|-n] [--output|-o [c++,python,js]] <IDL File>\n\n"
+    fprintf(stdout, "\nUsage: ftrpc [--help|-h] [--no-version|-n] [--output|-o [c++,python,js,ts]] <IDL File>\n\n"
                     "--help|-h            Show this message.\n"
                     "--output|-o          Who will choose to generate.\n"
                     "--no-version-n|-n    No version infomation in output.\n"
