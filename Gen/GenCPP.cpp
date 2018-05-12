@@ -54,6 +54,14 @@ void CloseHeadToWrite(FILE *fp, const char *fn)
     fclose(fp);
 }
 
+const char *ForceConvert_CPP(enum Type T) {
+    if (isBaseType(T)) {
+        return "";
+    } else {
+        return "(Json::Value)";
+    }
+}
+
 std::string GenerateCPP_StructDeclare(TypeID id, TokenManage &tokenSystem, TypeManage &typeSystem, unsigned int tabLevel = 0) {
     std::string TabFormat(tabLevel, '\t');
     auto &members = typeSystem.StructsMap[id];
@@ -99,11 +107,11 @@ std::string GenerateCPP_StructCheckConvert(TypeID id, TokenManage &tokenSystem, 
     return code;
 }
 
-bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem)
+bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem, const char *prefix)
 {
     char head_file_name[32], src_file_name[32];
-    sprintf(head_file_name, "ftrpc.provider%s.h", hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
-    sprintf(src_file_name, "ftrpc.provider%s.cpp", hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
+    sprintf(head_file_name, "%s.provider%s.h", prefix, hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
+    sprintf(src_file_name, "%s.provider%s.cpp", prefix, hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
 
     FILE *pProviderHeaderFile = OpenHeadToWrite(head_file_name);
     fprintf(pProviderHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document->version);
@@ -182,11 +190,11 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
     return true;
 }
 
-bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem)
+bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem, const char *prefix)
 {
     char head_file_name[32], src_file_name[32];
-    sprintf(head_file_name, "ftrpc.caller%s.h", hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
-    sprintf(src_file_name, "ftrpc.caller%s.cpp", hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
+    sprintf(head_file_name, "%s.caller%s.h", prefix, hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
+    sprintf(src_file_name, "%s.caller%s.cpp", prefix, hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
 
     FILE *pCallerHeaderFile = OpenHeadToWrite(head_file_name);
     fprintf(pCallerHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document->version);
@@ -264,9 +272,9 @@ bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenS
     CloseHeadToWrite(pCallerHeaderFile, head_file_name);
 }
 
-bool GenerateCPP(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem)
+bool GenerateCPP(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem, const char *prefix)
 {
-    GenerateCPP_Provider(document, tokenSystem, typeSystem);
-    GenerateCPP_Caller(document, tokenSystem, typeSystem);
+    GenerateCPP_Provider(document, tokenSystem, typeSystem, prefix);
+    GenerateCPP_Caller(document, tokenSystem, typeSystem, prefix);
     return true;
 }

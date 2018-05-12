@@ -27,9 +27,9 @@ std::string GenerateTypeScript_StructDeclare(TypeID id, TokenManage &tokenSystem
     return Structure;
 }
 
-bool GenerateTypeScript_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem) {
+bool GenerateTypeScript_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem, const char *prefix) {
     char ts_file_name[32];
-    sprintf(ts_file_name, "ftrpc.caller%s.ts", hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
+    sprintf(ts_file_name, "%s.caller%s.ts", prefix, hadVersionInfo ? ".v" PROGRAM_VERSION_STR : "");
     std::string CallerTplFile = ReadTemplate(CALLER_TPL_FILE);
     std::string ModuleDefine;
     std::string VersionString("\nlet version: number = ");
@@ -97,6 +97,6 @@ bool GenerateTypeScript_Caller(std::unique_ptr<RootNode> &document, TokenManage 
     fclose(pCallerSrcFile);
 }
 
-bool GenerateTypeScript(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem){
-    GenerateTypeScript_Caller(document, tokenSystem, typeSystem);
+bool GenerateTypeScript(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem, const char *prefix){
+    GenerateTypeScript_Caller(document, tokenSystem, typeSystem, prefix);
 }

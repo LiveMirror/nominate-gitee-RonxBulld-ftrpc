@@ -57,14 +57,6 @@ bool isBaseType(enum Type T) {
     }
 }
 
-const char *ForceConvert_CPP(enum Type T) {
-    if (isBaseType(T)) {
-        return "";
-    } else {
-        return "(Json::Value)";
-    }
-}
-
 std::string ReadFileAsTxt(const char *path) {
     FILE *fp = fopen(path, "r");
     if (fp == nullptr) {
@@ -96,8 +88,13 @@ std::string ReadFileAsTxt(const std::string &path) {
 std::string ReadTemplate(const std::string &path) {
     char szFilePath[MAX_PATH + 1]={0};
     GETEXEPATH(szFilePath);
-    (strrchr(szFilePath, '\\'))[1] = 0;
-    strcat(szFilePath, path.c_str());
+    char *p = strrchr(szFilePath, '\\');
+    if (p) {
+        p[1] = 0;
+        strcat(szFilePath, path.c_str());
+    } else {
+        strcpy(szFilePath, path.c_str());
+    }
     return ReadFileAsTxt(szFilePath);
 }
 #undef GETEXEPATH

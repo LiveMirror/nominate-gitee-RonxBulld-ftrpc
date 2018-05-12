@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include "parser.h"
 #include "Gen/GenCPP.h"
@@ -92,8 +93,10 @@ int main(int argc, char **argv) {
         std::string name = parser.tokenManage[token];
         RegistType((enum Type)structure.first, "is"+name+"Struct", "as"+name+"Struct", "struct "+name, name);
     }
+    char filename[260];
+    _splitpath(argv[argc - 1], nullptr, nullptr, filename, nullptr);
     if (cppEnable) {
-        GenerateCPP(parser.document, parser.tokenManage, parser.typeManage);
+        GenerateCPP(parser.document, parser.tokenManage, parser.typeManage, filename);
         if (builtJson) {
             WRITE_JSON_FILE("json.cpp", jsoncpp_cpp);
             mkdir("json");
@@ -102,7 +105,7 @@ int main(int argc, char **argv) {
         }
     }
     if (tsEnable) {
-        GenerateTypeScript(parser.document, parser.tokenManage, parser.typeManage);
+        GenerateTypeScript(parser.document, parser.tokenManage, parser.typeManage, filename);
     }
     return 0;
 }
