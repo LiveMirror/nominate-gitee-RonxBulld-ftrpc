@@ -71,6 +71,7 @@ std::string GenerateCPP_StructDeclare(TypeID id, TokenManage &tokenSystem, TypeM
     for (const auto[type, token] : members) {
         Structure += TabFormat + "\t" + GetCppType((enum Type) type) + " " + tokenSystem[token] + ";\n";
     }
+    Structure += "#ifdef __OVER_FTRPC_INNER_CODE__\n";
     Structure += TabFormat + "\texplicit operator Json::Value() {\n"
                + TabFormat + "\t\tJson::Value _value;\n";
     for (const auto [type, token] : members) {
@@ -78,6 +79,7 @@ std::string GenerateCPP_StructDeclare(TypeID id, TokenManage &tokenSystem, TypeM
     }
     Structure += TabFormat + "\t\treturn _value;\n"
                + TabFormat + "\t}\n";
+    Structure += "#endif // __OVER_FTRPC_INNER_CODE__\n";
     Structure += TabFormat + "};\n";
     return Structure;
 }
@@ -115,8 +117,7 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
 
     FILE *pProviderHeaderFile = OpenHeadToWrite(head_file_name);
     fprintf(pProviderHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document->version);
-    fprintf(pProviderHeaderFile, "\n#include <string>\n"
-                                 "#include \"json/json.h\"\n\n"
+    fprintf(pProviderHeaderFile, "\n#include <string>\n\n"
                                  "std::string ProviderDoCall(const std::string &JSON);\n\n");
     FILE *pProviderSrcFile = fopen(src_file_name, "w+");
     std::string ProviderTplFile = ReadTemplate(PROVIDER_TPL_FILE);
@@ -198,8 +199,7 @@ bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenS
 
     FILE *pCallerHeaderFile = OpenHeadToWrite(head_file_name);
     fprintf(pCallerHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document->version);
-    fprintf(pCallerHeaderFile, "\n#include <string>\n"
-                               "#include \"json/json.h\"\n\n");
+    fprintf(pCallerHeaderFile, "\n#include <string>\n\n");
 
     FILE *pCallerSrcFile = fopen(src_file_name, "w+");
     std::string CallerTplFile = ReadTemplate(CALLER_TPL_FILE);
