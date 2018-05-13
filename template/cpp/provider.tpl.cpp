@@ -4,7 +4,7 @@
 #include <sstream>
 #include <memory>
 #include "json/json.h"
-#define __OVER_INNER_CODE__
+#define __OVER_FTRPC_INNER_CODE__
 // #@{FTRPC Provider Head File}@#
 #ifdef PROVIDER_DEMO_INSIDE
 #include "ftrpc.provider.v2.h"

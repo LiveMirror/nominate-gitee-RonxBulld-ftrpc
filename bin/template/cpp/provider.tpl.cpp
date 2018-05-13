@@ -3,11 +3,12 @@
 #include <map>
 #include <sstream>
 #include <memory>
+#include "json/json.h"
+#define __OVER_FTRPC_INNER_CODE__
 // #@{FTRPC Provider Head File}@#
 #ifdef PROVIDER_DEMO_INSIDE
 #include "ftrpc.provider.v2.h"
 #endif
-#include "json/json.h"
 #include "TypeDef.h"
 
 #define RETURN do{ Json::StreamWriterBuilder swb; \
