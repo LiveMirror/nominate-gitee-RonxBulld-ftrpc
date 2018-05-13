@@ -7,6 +7,7 @@
 #include <fstream>
 #include <vector>
 #include <stdio.h>
+#include <string.h>
 
 #include "GenUtils.h"
 
@@ -82,7 +83,8 @@ std::string ReadFileAsTxt(const std::string &path) {
 #define GETEXEPATH(szfp) GetModuleFileName(nullptr, szfp, MAX_PATH)
 #else
 #include <unistd.h>
-#define MAX_PATH _MAX_PATH
+#include <linux/limits.h>
+#define MAX_PATH PATH_MAX
 #define GETEXEPATH(szfp) readlink("/proc/self/exe", szfp, MAX_PATH)
 #endif
 std::string ReadTemplate(const std::string &path) {

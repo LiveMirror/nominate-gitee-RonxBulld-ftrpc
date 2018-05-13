@@ -3,6 +3,7 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include "parser.h"
 #include "Gen/GenCPP.h"
@@ -94,12 +95,22 @@ int main(int argc, char **argv) {
         RegistType((enum Type)structure.first, "is"+name+"Struct", "as"+name+"Struct", "struct "+name, name);
     }
     char filename[260];
-    _splitpath(argv[argc - 1], nullptr, nullptr, filename, nullptr);
+    char *nptr = argv[argc - 1];
+    char *lptr = strrchr(nptr, '\\');
+    if (lptr == nullptr) { lptr = nptr; } else { lptr++; }
+    char *rptr = strrchr(nptr, '.');
+    if (rptr == nullptr) { rptr = nptr + strlen(nptr); }
+    strncpy(filename, lptr, rptr - lptr);
+    filename[rptr-lptr] = '\0';
     if (cppEnable) {
         GenerateCPP(parser.document, parser.tokenManage, parser.typeManage, filename);
         if (builtJson) {
             WRITE_JSON_FILE("json.cpp", jsoncpp_cpp);
+#ifndef WIN32
+            mkdir("json", 755);
+#else
             mkdir("json");
+#endif
             WRITE_JSON_FILE("json/json.h", json_json_h);
             WRITE_JSON_FILE("json/json-forwards.h", json_json_forwards_h);
         }
