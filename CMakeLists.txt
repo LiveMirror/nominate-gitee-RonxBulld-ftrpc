@@ -8,8 +8,6 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
     ADD_CUSTOM_COMMAND(OUTPUT copy_res
             COMMAND xcopy $(CMAKE_SOURCE_DIR)\\template .\\template /e/h/y/i
             COMMAND copy $(CMAKE_SOURCE_DIR)\\License.txt .\\License.txt
-            COMMAND copy $(CMAKE_SOURCE_DIR)\\TypeDef.h .\\TypeDef.h
-            COMMAND copy $(CMAKE_SOURCE_DIR)\\keywords.h .\\keywords.h
             COMMAND copy $(CMAKE_SOURCE_DIR)\\sample\\test.idl .\\test.idl
             )
     add_custom_target(CopyTask ALL DEPENDS copy_res)
@@ -17,8 +15,6 @@ ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
     ADD_CUSTOM_COMMAND(OUTPUT copy_res
             COMMAND cp -a $(CMAKE_SOURCE_DIR)/template ./template
             COMMAND cp $(CMAKE_SOURCE_DIR)/License.txt ./License.txt
-            COMMAND cp $(CMAKE_SOURCE_DIR)/TypeDef.h ./TypeDef.h
-            COMMAND cp $(CMAKE_SOURCE_DIR)/keywords.h ./keywords.h
             COMMAND cp $(CMAKE_SOURCE_DIR)/sample/test.idl ./test.idl
             #COMMAND sed -i '/\/\* SED REMOVE/,/!SED REMOVE\*\//d' ./template/typescript/caller.tpl.ts
             )

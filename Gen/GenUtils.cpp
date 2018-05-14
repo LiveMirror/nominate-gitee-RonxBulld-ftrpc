@@ -65,10 +65,11 @@ std::string ReadFileAsTxt(const char *path) {
         throw std::invalid_argument(path);
     }
     fseek(fp, 0, SEEK_END);
-    long len = ftell(fp);
-    auto mem = (char *)malloc(len * sizeof(char));
+    auto len = (size_t)ftell(fp);
+    auto mem = (char *)malloc(len);
     fseek(fp, 0, SEEK_SET);
-    fread(mem, 1, (size_t )len, fp);
+    len = fread(mem, 1, (size_t)len, fp);
+    mem[len] = '\0';
     std::string s(mem);
     free(mem);
     return s;
