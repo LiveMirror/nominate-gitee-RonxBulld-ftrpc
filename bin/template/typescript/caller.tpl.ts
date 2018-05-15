@@ -57,4 +57,4 @@ export class ftrpc_caller {
             return false;
         }
     }
-}
+};

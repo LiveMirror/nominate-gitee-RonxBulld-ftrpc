@@ -89,11 +89,19 @@ int main(int argc, char **argv) {
     std::string Su = ReadFileAsTxt(argv[argc - 1]);
     parse parser(Su.c_str());
     parser.work();
-    for (auto structure : parser.typeManage.StructsMap) {
-        TokenID token = parser.typeManage.ty2tk[structure.first];
-        std::string name = parser.tokenManage[token];
-        RegistType((enum Type)structure.first, "is"+name+"Struct", "as"+name+"Struct", "struct "+name, name);
+    for (auto &module : parser.document->modules) {
+        std::string module_name = parser.tokenManage[module.name];
+        for (auto &structure : module.structs) {
+            TokenID token = parser.typeManage.ty2tk[structure.type];
+            std::string name = parser.tokenManage[token];
+            RegistType(structure.type, "is"+name+"Struct", "as"+name+"Struct", "struct "+module_name+"::"+name, name);
+        }
     }
+//    for (auto structure : parser.typeManage.StructsMap) {
+//        TokenID token = parser.typeManage.ty2tk[structure.first];
+//        std::string name = parser.tokenManage[token];
+//        RegistType((enum Type)structure.first, "is"+name+"Struct", "as"+name+"Struct", "struct "+name, name);
+//    }
     char filename[260];
     char *nptr = argv[argc - 1];
     char *lptr = strrchr(nptr, '\\');

@@ -66,9 +66,9 @@ std::string ReadFileAsTxt(const char *path) {
     }
     fseek(fp, 0, SEEK_END);
     auto len = (size_t)ftell(fp);
-    auto mem = (char *)malloc(len);
+    auto mem = (char *)malloc(len * sizeof(char));
     fseek(fp, 0, SEEK_SET);
-    len = fread(mem, 1, (size_t)len, fp);
+    len = fread(mem, sizeof(char), (size_t)len, fp);
     mem[len] = '\0';
     std::string s(mem);
     free(mem);
