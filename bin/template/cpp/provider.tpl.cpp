@@ -74,7 +74,7 @@ public:
     JsonValueExtra(const Json::Value &jvalue) : Json::Value(jvalue) { }
 };
 
-std::string ProviderDoCall(const std::string &JSON)
+std::string ProviderDoCall(const std::string &JSON, void *extraOption)
 {
     Json::CharReaderBuilder crb;
     std::unique_ptr<Json::CharReader> reader(crb.newCharReader());

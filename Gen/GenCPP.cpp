@@ -118,7 +118,7 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
     FILE *pProviderHeaderFile = OpenHeadToWrite(head_file_name);
     fprintf(pProviderHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document->version);
     fprintf(pProviderHeaderFile, "\n#include <string>\n\n"
-                                 "std::string ProviderDoCall(const std::string &JSON);\n\n");
+                                 "std::string ProviderDoCall(const std::string &JSON, void *extraOption = nullptr);\n\n");
     FILE *pProviderSrcFile = fopen(src_file_name, "w+");
     std::string ProviderTplFile = ReadTemplate(PROVIDER_TPL_FILE);
     std::string FunctionMicro, FunctionCheckAndCall, JsonExtern;
@@ -162,9 +162,11 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
                         GetJsonConvertMethod(param.type.type)).append("(), ");
                 paramIndex++;
             }
+            fprintf(pProviderHeaderFile, "void *extraOption");
+            FunctionCheckAndCall.append("extraOption");
             if(!api.params.empty()) {
-                fseek(pProviderHeaderFile, -1, SEEK_CUR);
-                FunctionCheckAndCall.erase(FunctionCheckAndCall.end() - 2, FunctionCheckAndCall.end());
+                /* fseek(pProviderHeaderFile, -1, SEEK_CUR);
+                FunctionCheckAndCall.erase(FunctionCheckAndCall.end() - 2, FunctionCheckAndCall.end()); */
                 CheckParaments.insert(0, "\t\t\t\tif (!(");
                 CheckParaments.erase(CheckParaments.end() - 4, CheckParaments.end());
                 CheckParaments.append(")) {\n\t\t\t\t\tFAILED(\"Arguments type check error.\");\n\t\t\t\t}\n");
