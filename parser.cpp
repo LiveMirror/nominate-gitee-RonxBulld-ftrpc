@@ -59,6 +59,7 @@ std::unique_ptr<StructNode> parse::parseStruct() {
     if (T.type != '}') {
         do {
             std::unique_ptr<TypeNode> type = CALL_UNTERMINAL_PARSER(Type);
+            if (!type) return nullptr;
             REQUIRE_TOKEN(T, TOKEN_ID, "Require member name after type.");
             Member member;
             member.first = type->type;
@@ -127,7 +128,9 @@ std::unique_ptr<TypeNode> parse::parseType()
 std::unique_ptr<ParamNode> parse::parseParam()
 {
     std::unique_ptr<ParamNode> param(new ParamNode());
-    param->type = *CALL_UNTERMINAL_PARSER(Type);
+    auto type = CALL_UNTERMINAL_PARSER(Type);
+    if (!type) return nullptr;
+    param->type = *type;
     if(param->type.type == TY_void) {
         this->reportError("The parameter type should not be void.");
         return nullptr;
@@ -145,6 +148,7 @@ std::unique_ptr<ApiNode> parse::parseApi() {
     std::unique_ptr<ApiNode> api(new ApiNode());
     token T;
     std::unique_ptr<TypeNode> type = CALL_UNTERMINAL_PARSER(Type);
+    if (!type) return nullptr;
     api->retType.type = type->type;
     REQUIRE_TOKEN(T, TOKEN_ID, "You should provide the api name.");
     api->name = T.value.string;
@@ -153,6 +157,7 @@ std::unique_ptr<ApiNode> parse::parseApi() {
     if (T.type != ')') {
         do {
             std::unique_ptr<ParamNode> param = CALL_UNTERMINAL_PARSER(Param);
+            if (!param) return nullptr;
             api->params.push_back(*param);
             GETTOKEN(T);
         } while (T.type == ',');
@@ -180,14 +185,14 @@ std::unique_ptr<ModuleNode> parse::parseModule()
         while (true) {
             if (T.type == TOKEN_struct) {
                 std::unique_ptr<StructNode> structure = CALL_UNTERMINAL_PARSER(Struct);
+                if (!structure) return nullptr;
                 module->structs.push_back(*structure);
                 SEE_NEXT_TOKEN(T);
             } else if (typeManage.isType(T.value.token)) {
-                do {
-                    std::unique_ptr<ApiNode> api = CALL_UNTERMINAL_PARSER(Api);
-                    module->apis.push_back(*api);
-                    SEE_NEXT_TOKEN(T);
-                } while (typeManage.isType(T.value.token));
+                std::unique_ptr<ApiNode> api = CALL_UNTERMINAL_PARSER(Api);
+                if (!api) return nullptr;
+                module->apis.push_back(*api);
+                SEE_NEXT_TOKEN(T);
             } else {
                 break;
             }
@@ -214,6 +219,7 @@ std::unique_ptr<RootNode> parse::parseRoot()
     if (T.type == TOKEN_module) {
         do {
             std::unique_ptr<ModuleNode> module = CALL_UNTERMINAL_PARSER(Module);
+            if (!module) return nullptr;
             ModuleNode Tmn = *module;
             root->modules.push_back(Tmn);
             SEE_NEXT_TOKEN(T);
@@ -225,5 +231,6 @@ std::unique_ptr<RootNode> parse::parseRoot()
 bool parse::work()
 {
     this->document = CALL_UNTERMINAL_PARSER(Root);
-    return true;
+    if (!this->document) return false;
+    else return true;
 }

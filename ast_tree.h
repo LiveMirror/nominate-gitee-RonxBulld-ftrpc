@@ -26,6 +26,7 @@ class TypeNode : public astTreeNode
 {
 public:
     enum Type type;
+    bool isArray = false;
     explicit TypeNode(enum Type type = TY_NAN) {
         this->nodeType = NT_TYPE;
         this->type = type;

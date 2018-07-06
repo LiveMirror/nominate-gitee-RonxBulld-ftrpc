@@ -88,7 +88,9 @@ int main(int argc, char **argv) {
     fprintf(stdout, "\n");
     std::string Su = ReadFileAsTxt(argv[argc - 1]);
     parse parser(Su.c_str());
-    parser.work();
+    if (!parser.work()) {
+        return -1;
+    }
     for (auto &module : parser.document->modules) {
         std::string module_name = parser.tokenManage[module.name];
         for (auto &structure : module.structs) {
