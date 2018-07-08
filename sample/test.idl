@@ -8,9 +8,9 @@ module Test:
         string c;
         bool d;
     };
-	void request(string req, int tz, bool flag);
+	void request(string[] req, int tz, bool flag);
 	Custom sss(Custom p, Custom q);
-	string requireNewStockInfo();
+	string[] requireNewStockInfo();
 	struct NewStruct:
 	{
 	    int c;

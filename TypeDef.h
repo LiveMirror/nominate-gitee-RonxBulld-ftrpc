@@ -7,6 +7,7 @@
 
 enum Type {
     TY_NAN = -1,
+    TY_ARRAY,
 #define TYPE(k) TY_##k,
 #define KEYWD(k)
 #include "keywords.h"

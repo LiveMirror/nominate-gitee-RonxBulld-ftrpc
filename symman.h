@@ -8,6 +8,7 @@
 #include <map>
 #include <string>
 #include <list>
+#include "ast_tree.h"
 
 typedef unsigned int TokenID;
 class TokenManage
@@ -20,11 +21,11 @@ public:
     TokenID operator[](const std::string &Token);
     const std::string &operator[](const TokenID &ID);
     TokenManage(std::initializer_list<std::pair<std::string, TokenID>> initToken);
-    TokenManage() {}
+    TokenManage() = default;
 };
 
 typedef unsigned int TypeID;
-typedef std::pair<TypeID, TokenID> Member;
+typedef std::pair<TypeNode, TokenID> Member;
 typedef std::list<Member> MemberLists;
 class TypeManage
 {
@@ -34,8 +35,8 @@ public:
     std::map<TokenID, TypeID> tk2ty;    // TokenID -> TypeID
     std::map<TypeID, TokenID> ty2tk;    // TypeID -> TokenID
     std::map<TypeID, MemberLists> StructsMap;    // TypeID { TypeID* }
-    TypeManage(std::initializer_list<Member> initBaseType);
-    TypeManage() {}
+    TypeManage(std::initializer_list<std::pair<TypeID, TokenID>> initBaseType);
+    TypeManage() = default;
     enum typeDefType { DeclareBase, DeclareStruct };
     void registType(TokenID Name, enum typeDefType DeclareType, MemberLists &MemberList);
     TypeID getTypeID(TokenID Name);

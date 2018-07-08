@@ -28,7 +28,7 @@ const std::string &TokenManage::operator[](const TokenID &ID) {
     }
 }
 
-TypeManage::TypeManage(std::initializer_list<Member> initBaseType) {
+TypeManage::TypeManage(std::initializer_list<std::pair<TypeID, TokenID>> initBaseType) {
     for(auto member : initBaseType) {
         this->tk2ty.insert(std::make_pair(member.second, member.first));
         this->ty2tk.insert(std::make_pair(member.first, member.second));

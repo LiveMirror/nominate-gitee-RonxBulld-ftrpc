@@ -20,6 +20,7 @@
                                             } while(0)
 #define PUSHBACK(T) this->lexer->pushBack(T)
 #define SEE_NEXT_TOKEN(T) do { GETTOKEN(T); PUSHBACK(T); } while (0)
+
 #define CALL_UNTERMINAL_PARSER(unterminal) ([&](){ \
                                                    std::unique_ptr<unterminal##Node> node = this->parse##unterminal(); \
                                                    return node; \
@@ -62,7 +63,7 @@ std::unique_ptr<StructNode> parse::parseStruct() {
             if (!type) return nullptr;
             REQUIRE_TOKEN(T, TOKEN_ID, "Require member name after type.");
             Member member;
-            member.first = type->type;
+            member.first = *type;
             member.second = T.value.string;
             members.push_back(member);
             REQUIRE_TOKEN(T, ';', "Require `;`.");
@@ -119,6 +120,13 @@ std::unique_ptr<TypeNode> parse::parseType()
             return nullptr;
         }
     }
+    // Check if had array declare symbol
+    SEE_NEXT_TOKEN(T);
+    if (T.value.c == '[') {
+        GETTOKEN(T);
+        REQUIRE_TOKEN(T, ']', "Require `]`.");
+        type->isArray = true;
+    }
     return type;
 }
 
@@ -149,7 +157,7 @@ std::unique_ptr<ApiNode> parse::parseApi() {
     token T;
     std::unique_ptr<TypeNode> type = CALL_UNTERMINAL_PARSER(Type);
     if (!type) return nullptr;
-    api->retType.type = type->type;
+    api->retType = *type;
     REQUIRE_TOKEN(T, TOKEN_ID, "You should provide the api name.");
     api->name = T.value.string;
     REQUIRE_TOKEN(T, '(', "Request ')'.");

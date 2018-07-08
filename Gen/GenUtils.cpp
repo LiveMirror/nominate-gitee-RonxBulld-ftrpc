@@ -39,10 +39,30 @@ bool RegistType(TypeID type, const std::string &JsonCheckMethod, const std::stri
     std::vector<std::string> insItem{JsonCheckMethod, JsonParseMethod, CppTypeName_Gen, TypescriptTypeName_Gen};
     typeMap.insert(std::make_pair(type, insItem));
 }
-std::string &GetJsonCheckMethod(enum Type T)   { return typeMap[T][JsonCheckMethod]; }
-std::string &GetJsonConvertMethod(enum Type T) { return typeMap[T][JsonParseMethod]; }
-std::string &GetCppType(enum Type T)           { return typeMap[T][CppTypeName_Gen]; }
-std::string &GetTsType(enum Type T)            { return typeMap[T][TypescriptTypeName_Gen]; }
+const std::string GetJsonCheckMethod(TypeNode T) {
+    if (!T.isArray)
+        return typeMap[T.type][JsonCheckMethod] + "()";
+    else
+        return "isJsonArray(&JsonValueExtra::" + typeMap[T.type][JsonCheckMethod] + ")";
+}
+const std::string GetJsonConvertMethod(TypeNode T) {
+    if (!T.isArray)
+        return typeMap[T.type][JsonParseMethod] + "()";
+    else
+        return "asJsonArray(&JsonValueExtra::" + typeMap[T.type][JsonParseMethod] + ")";
+}
+const std::string GetCppType(TypeNode T) {
+    if (!T.isArray)
+        return typeMap[T.type][CppTypeName_Gen];
+    else
+        return "const std::vector<" + typeMap[T.type][CppTypeName_Gen] + ">";
+}
+const std::string GetTsType(TypeNode T) {
+    if (!T.isArray)
+        return typeMap[T.type][TypescriptTypeName_Gen];
+    else
+        return "Array<" + typeMap[T.type][TypescriptTypeName_Gen] + ">";
+}
 
 bool isBaseType(enum Type T) {
     switch (T)

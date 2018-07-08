@@ -15,10 +15,10 @@ extern bool hadVersionInfo;
 
 template<typename T> bool RegistType(TypeID type, const T &JsonCheckMethod, const T &JsonParseMethod, const T &CppTypeName_Gen, const T &TypescriptTypeName_Gen);
 bool RegistType(TypeID type, const std::string &JsonCheckMethod, const std::string &JsonParseMethod, const std::string &CppTypeName_Gen, const std::string &TypescriptTypeName_Gen);
-std::string &GetJsonCheckMethod(enum Type T);
-std::string &GetJsonConvertMethod(enum Type T);
-std::string &GetCppType(enum Type T);
-std::string &GetTsType(enum Type T);
+const std::string GetJsonCheckMethod(TypeNode T);
+const std::string GetJsonConvertMethod(TypeNode T);
+const std::string GetCppType(TypeNode T);
+const std::string GetTsType(TypeNode T);
 std::string ReadFileAsTxt(const char *path);
 std::string ReadFileAsTxt(std::string &path);
 std::string ReadTemplate(const std::string &path);

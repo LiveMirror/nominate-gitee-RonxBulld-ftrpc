@@ -49,6 +49,22 @@ public:
     }
 #endif
     JsonValueExtra(const Json::Value &jvalue) : Json::Value(jvalue) { }
+    bool isJsonArray(bool (JsonValueExtra::*method)() const) {
+        if (!this->isArray()) { return false; }
+        for (int index = 0; index < this->size(); index++) {
+            if (!(static_cast<JsonValueExtra>(this->operator[](index)).*method)()) {
+                return false;
+            }
+        }
+        return true;
+    }
+    template <class T> std::vector<T> asJsonArray(T (JsonValueExtra::*method)() const) {
+        std::vector<T> cppArray;
+        for (int index = 0; index < this->size(); index++) {
+            cppArray.push_back((this->operator[](index).*method)());
+        }
+        return cppArray;
+    }
 };
 
 // @#{Non-blocking RPC with callback}@#

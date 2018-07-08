@@ -21,7 +21,7 @@ std::string GenerateTypeScript_StructDeclare(TypeID id, TokenManage &tokenSystem
     std::string name = tokenSystem[typeSystem.ty2tk[id]];
     Structure += "export class " + name + " {\n";
     for (const auto [type,token] : members) {
-        Structure += TabFormat + "\t" + tokenSystem[token] + ": " + GetTsType((enum Type) type) + ";\n";
+        Structure += TabFormat + "\t" + tokenSystem[token] + ": " + GetTsType(type) + ";\n";
     }
     Structure += TabFormat + "}\n";
     return Structure;
@@ -55,7 +55,7 @@ bool GenerateTypeScript_Caller(std::unique_ptr<RootNode> &document, TokenManage 
             int paramIndex = 0;
             for(auto &param : api.params) {
                 std::string paramName = tokenSystem[param.name];
-                ModuleDefine.append(paramName).append(": ").append(GetTsType(param.type.type)).append(", ");
+                ModuleDefine += paramName + ": " + GetTsType(param.type) + ", ";
                 FunctionParams.append(paramName).append(", ");
                 paramIndex++;
             }
@@ -64,7 +64,7 @@ bool GenerateTypeScript_Caller(std::unique_ptr<RootNode> &document, TokenManage 
             }
             ModuleDefine.append("_callback: (");
             if (api.retType.type != TY_void) {
-                ModuleDefine.append("RetValue: ").append(GetTsType(api.retType.type));
+                ModuleDefine.append("RetValue: ").append(GetTsType(api.retType));
             }
             ModuleDefine.append(") => void): string {\n");
             ModuleDefine.append("\t\tlet thisSerial = ftrpc_caller.serial++;\n");

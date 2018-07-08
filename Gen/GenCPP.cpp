@@ -7,6 +7,7 @@
 #include <tuple>
 #include <fstream>
 #include <exception>
+#include <vector>
 #include "GenCPP.h"
 #include "GenUtils.h"
 
@@ -54,11 +55,28 @@ void CloseHeadToWrite(FILE *fp, const char *fn)
     fclose(fp);
 }
 
-const char *ForceConvert_CPP(enum Type T) {
-    if (isBaseType(T)) {
-        return "";
+/**
+ * Generate convert code from c++ to json, a prefix code will return, '('')' must around variable or function after.
+ * @param CppVariable
+ * @param T
+ * @param TabFormat
+ * @return
+ */
+const std::string ForceConvert_CPP(TypeNode T) {
+    if (!T.isArray) {
+        if (isBaseType(T.type)) {
+            return "";
+        } else {
+            return "(Json::Value)";
+        }
     } else {
-        return "(Json::Value)";
+        TypeNode _T = T;
+        _T.isArray = false;
+        std::string typeConv = ForceConvert_CPP(_T);
+        std::string tmp = "([&](auto &cppArray){ Json::Value arrayObj; ";
+        tmp += "for (int index = 0; index < cppArray.size(); index++) arrayObj[index] = " + typeConv + "static_cast<JsonValueExtra>(cppArray[index]);";
+        tmp += " return arrayObj; })";
+        return tmp;
     }
 }
 
@@ -69,13 +87,14 @@ std::string GenerateCPP_StructDeclare(TypeID id, TokenManage &tokenSystem, TypeM
     std::string name = tokenSystem[typeSystem.ty2tk[id]];
     Structure += "struct " + name + "\n" + TabFormat + "{\n";
     for (const auto[type, token] : members) {
-        Structure += TabFormat + "\t" + GetCppType((enum Type) type) + " " + tokenSystem[token] + ";\n";
+        Structure += TabFormat + "\t" + GetCppType(type) + " " + tokenSystem[token] + ";\n";
     }
     Structure += "#ifdef __OVER_FTRPC_INNER_CODE__\n";
     Structure += TabFormat + "\texplicit operator Json::Value() {\n"
                + TabFormat + "\t\tJson::Value _value;\n";
     for (const auto [type, token] : members) {
-        Structure += TabFormat + "\t\t_value[\"" + tokenSystem[token] + "\"] = " + ForceConvert_CPP((enum Type)type) + tokenSystem[token] + ";\n";
+        const std::string & TOKEN = tokenSystem[token];
+        Structure += TabFormat + "\t\t_value[\"" + TOKEN + "\"] = " + ForceConvert_CPP(type) + "(" + TOKEN + ");\n";
     }
     Structure += TabFormat + "\t\treturn _value;\n"
                + TabFormat + "\t}\n";
@@ -88,13 +107,16 @@ std::string GenerateCPP_StructCheckConvert(TypeID id, TokenManage &tokenSystem, 
     std::string name = tokenSystem[typeSystem.ty2tk[id]];
     std::string FullName = FieldName + "::" + name;
     auto &members = typeSystem.StructsMap[id];
+    // Generate check code
     std::string code = "\tbool is" + name + "Struct() {\n";
     for (const auto & [type, token] : members) {
-        code += "\t\tif (!this->operator[](\"" + tokenSystem[token] + "\")." + GetJsonCheckMethod((enum Type)type) + "()) { return false; }\n";
+        const std::string TOKEN = "this->operator[](\"" + tokenSystem[token] + "\")";
+        code += "\t\tif (!" + TOKEN + "." + GetJsonCheckMethod(type) + ") { return false; }\n";
     }
     code += "\t\treturn true;\n"
             "\t}\n";
 
+    // Generate convert code
     code += "\tstruct " + FullName + " as" + name + "Struct() {\n";
     code += "\t\tif (!this->is" + name + "Struct()) {\n"
             "\t\t\tthrow std::runtime_error(\"Cannot parse as " + FullName + "\");\n"
@@ -102,7 +124,8 @@ std::string GenerateCPP_StructCheckConvert(TypeID id, TokenManage &tokenSystem, 
     std::string tempValueName = "__Tmp_" + name + "__";
     code += "\t\tstruct " + FullName + " " + tempValueName + ";\n";
     for (const auto & [type, token] : members) {
-        code += "\t\t" + tempValueName + "." + tokenSystem[token] + " = this->operator[](\"" + tokenSystem[token] + "\")." + GetJsonConvertMethod((enum Type)type) + "();\n";
+        const std::string & TOKEN = tokenSystem[token];
+        code += "\t\t" + tempValueName + "." + TOKEN + " = this->operator[](\"" + TOKEN + "\")." + GetJsonConvertMethod(type) + ";\n";
     }
     code += "\t\treturn " + tempValueName + ";\n"
             "\t}\n";
@@ -117,7 +140,7 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
 
     FILE *pProviderHeaderFile = OpenHeadToWrite(head_file_name);
     fprintf(pProviderHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document->version);
-    fprintf(pProviderHeaderFile, "\n#include <string>\n\n"
+    fprintf(pProviderHeaderFile, "\n#include <string>\n#include <vector>\n\n"
                                  "std::string ProviderDoCall(const std::string &JSON, void *extraOption = nullptr);\n\n");
     FILE *pProviderSrcFile = fopen(src_file_name, "w+");
     std::string ProviderTplFile = ReadTemplate(PROVIDER_TPL_FILE);
@@ -141,7 +164,7 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
             std::string FullApiName;
             FullApiName.append(CurModuleName).append("::").append(ApiName);
 
-            fprintf(pProviderHeaderFile, "\tstatic %s %s(", GetCppType(api.retType.type).c_str(), ApiName.c_str());
+            fprintf(pProviderHeaderFile, "\tstatic %s %s(", GetCppType(api.retType).c_str(), ApiName.c_str());
 
             FunctionMicro.append("#define FUNCTION_").append(CurModuleName).append("_").append(ApiName).append(" ").append(std::to_string(apiIndex++)).append(1,'\n');
             FunctionCheckAndCall.append("\t\t\tcase HashStringToInt(\"").append(FullApiName).append("\"): {\n\t\t\t\t");
@@ -149,31 +172,28 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
             FunctionCheckAndCall.append("// #@{Arguments Type Check}@#\n\t\t\t\t");
             if(api.retType.type != TY_void) {
                 FunctionCheckAndCall.append("ret[\"return\"] = ");
-                FunctionCheckAndCall.append(ForceConvert_CPP(api.retType.type));
+                FunctionCheckAndCall.append(ForceConvert_CPP(api.retType));
             }
+            FunctionCheckAndCall.append("(");
             FunctionCheckAndCall.append(FullApiName).append("(");
             // Params
             int paramIndex = 0;
             std::string CheckParaments;
             for(auto &param : api.params) {
-                fprintf(pProviderHeaderFile, "%s %s,", GetCppType(param.type.type).c_str(), tokenSystem[param.name].c_str());
-                CheckParaments.append("((JsonValueExtra*)(&param[").append(std::to_string(paramIndex)).append("]))->").append(GetJsonCheckMethod(param.type.type)).append("() && ");
-                FunctionCheckAndCall.append("((JsonValueExtra*)(&param[").append(std::to_string(paramIndex)).append("]))->").append(
-                        GetJsonConvertMethod(param.type.type)).append("(), ");
+                fprintf(pProviderHeaderFile, "%s %s,", GetCppType(param.type).c_str(), tokenSystem[param.name].c_str());
+                // Parament check
+                const std::string strParam = "param[" + std::to_string(paramIndex) + "]";
+                CheckParaments += "\t\t\t\tif (!(((JsonValueExtra*)(&" + strParam + "))->" + GetJsonCheckMethod(param.type) + "))"
+                                  " { FAILED(\"While call \\\"" + FullApiName + "\\\", arguments " + std::to_string(paramIndex) + " type check error.\"); }\n";
+                // Parament convert
+                FunctionCheckAndCall += "((JsonValueExtra*)(&" + strParam + "))->" + GetJsonConvertMethod(param.type) + ", ";
                 paramIndex++;
             }
             fprintf(pProviderHeaderFile, "void *extraOption");
             FunctionCheckAndCall.append("extraOption");
-            if(!api.params.empty()) {
-                /* fseek(pProviderHeaderFile, -1, SEEK_CUR);
-                FunctionCheckAndCall.erase(FunctionCheckAndCall.end() - 2, FunctionCheckAndCall.end()); */
-                CheckParaments.insert(0, "\t\t\t\tif (!(");
-                CheckParaments.erase(CheckParaments.end() - 4, CheckParaments.end());
-                CheckParaments.append(")) {\n\t\t\t\t\tFAILED(\"Arguments type check error.\");\n\t\t\t\t}\n");
-            }
             substring_replace(FunctionCheckAndCall, "// #@{Arguments Type Check}@#\n", CheckParaments);
             fprintf(pProviderHeaderFile, ");\n");
-            FunctionCheckAndCall.append(");\n\t\t\t\tbreak;\n\t\t\t}\n");
+            FunctionCheckAndCall.append("));\n\t\t\t\tbreak;\n\t\t\t}\n");
         }
         fprintf(pProviderHeaderFile, "};");
     }
@@ -233,15 +253,14 @@ bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenS
             int paramIndex = 0;
             for(auto &param : api.params) {
                 std::string paramName = tokenSystem[param.name];
-                fprintf(pCallerHeaderFile, "%s %s, ", GetCppType(param.type.type).c_str(), paramName.c_str());
-                FunctionWithCallBack.append(GetCppType(param.type.type)).append(" ").append(paramName).append(", ");
-                FunctionParams.append("\tparams[").append(std::to_string(paramIndex)).append("] = ").append(
-                        ForceConvert_CPP(param.type.type)).append(paramName).append(";\n");
+                fprintf(pCallerHeaderFile, "%s %s, ", GetCppType(param.type).c_str(), paramName.c_str());
+                FunctionWithCallBack.append(GetCppType(param.type)).append(" ").append(paramName).append(", ");
+                FunctionParams += "\tparams[" + std::to_string(paramIndex) + "] = " + ForceConvert_CPP(param.type) + "(" + paramName + ");\n";
                 paramIndex++;
             }
             FunctionWithCallBack.append("void(*_callback)(");
             if (api.retType.type != TY_void) {
-                FunctionWithCallBack.append(GetCppType(api.retType.type));
+                FunctionWithCallBack.append(GetCppType(api.retType));
             }
             FunctionWithCallBack.append("))\n{\n");
             FunctionWithCallBack.append("\tJson::Value ret;\n"
@@ -256,7 +275,7 @@ bool GenerateCPP_Caller(std::unique_ptr<RootNode> &document, TokenManage &tokenS
                                         "\tscmapMutex.unlock();\n"
                                         "\tRETURN;\n"
                                         "}\n\n");
-            fprintf(pCallerHeaderFile, "void(*_callback)(%s));\n", GetCppType(api.retType.type).c_str());
+            fprintf(pCallerHeaderFile, "void(*_callback)(%s));\n", GetCppType(api.retType).c_str());
         }
         fprintf(pCallerHeaderFile, "};");
     }
