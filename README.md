@@ -89,3 +89,10 @@ module NAME:
 接下来，在 module 的内部用户可以任意的进行 struct 或者 api 的定义了。定义有些类似于 C 语言，但是要记住 struct NAME 后面的冒号，以及右花括号后面的分号。
 
 基础类型目前仅支持 int float string bool，后续会提供更多的支持。
+
+
+# 关于数组
+
+如需使用数组，则在之前的类型后面加上 [] 即可，目前全部使用变长数组，不支持指定下标长度。目前的限制是：
+1. 只支持 C++ provider 和 typescript caller，不支持 C++ caller
+2. 不支持多维数组
