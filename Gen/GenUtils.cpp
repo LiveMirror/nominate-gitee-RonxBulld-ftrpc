@@ -55,7 +55,7 @@ const std::string GetCppType(TypeNode T) {
     if (!T.isArray)
         return typeMap[T.type][CppTypeName_Gen];
     else
-        return "const std::vector<" + typeMap[T.type][CppTypeName_Gen] + ">";
+        return "std::vector<" + typeMap[T.type][CppTypeName_Gen] + ">";
 }
 const std::string GetTsType(TypeNode T) {
     if (!T.isArray)

@@ -70,13 +70,7 @@ const std::string ForceConvert_CPP(TypeNode T) {
             return "(Json::Value)";
         }
     } else {
-        TypeNode _T = T;
-        _T.isArray = false;
-        std::string typeConv = ForceConvert_CPP(_T);
-        std::string tmp = "([&](auto &cppArray){ Json::Value arrayObj; ";
-        tmp += "for (int index = 0; index < cppArray.size(); index++) arrayObj[index] = " + typeConv + "static_cast<JsonValueExtra>(cppArray[index]);";
-        tmp += " return arrayObj; })";
-        return tmp;
+        return "CppArrayToJson";
     }
 }
 

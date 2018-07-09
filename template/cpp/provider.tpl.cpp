@@ -71,6 +71,7 @@ public:
         return _custom;
     }
 #endif
+    JsonValueExtra() : Json::Value() { }
     JsonValueExtra(const Json::Value &jvalue) : Json::Value(jvalue) { }
     bool isJsonArray(bool (JsonValueExtra::*method)() const) {
         if (!this->isArray()) { return false; }
@@ -97,7 +98,12 @@ public:
     }
 };
 
-
+template <class T> Json::Value CppArrayToJson(T && cppArray) {
+    Json::Value arrayObj;
+    for (int index = 0; index < cppArray.size(); index++)
+        arrayObj[index] = (Json::Value)cppArray[index];
+    return arrayObj;
+}
 
 std::string ProviderDoCall(const std::string &JSON, void *extraOption)
 {
