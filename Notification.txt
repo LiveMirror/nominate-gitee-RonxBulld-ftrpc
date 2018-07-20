@@ -1,0 +1,7 @@
+#ifndef NOTIFICATION
+#   error You must define NOTIFICATION() before include Notification.txt
+#endif
+
+NOTIFICATION("Auto generate by ftrpc")
+NOTIFICATION("Created by Rexfield on 2018/5/1")
+NOTIFICATION("Warning: Please do not modify any code unless you know what you are doing.")

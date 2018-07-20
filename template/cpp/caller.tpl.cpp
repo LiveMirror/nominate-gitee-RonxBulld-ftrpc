@@ -5,6 +5,7 @@
 #include <memory>
 #include <mutex>
 #include "json/json.h"
+#define __OVER_FTRPC_INNER_CODE__
 // #@{FTRPC Caller Head File}@#
 #ifdef PROVIDER_DEMO_INSIDE
 #include "ftrpc.caller.v2.h"
@@ -65,7 +66,21 @@ public:
         }
         return cppArray;
     }
+    template <class T> const std::vector<T> asJsonArray(T (Json::Value::*method)() const){
+        std::vector<T> cppArray;
+        for (int index = 0; index < this->size(); index++) {
+            cppArray.push_back((this->operator[](index).*method)());
+        }
+        return cppArray;
+    }
 };
+
+template <class T> Json::Value CppArrayToJson(T && cppArray) {
+    Json::Value arrayObj;
+    for (int index = 0; index < cppArray.size(); index++)
+        arrayObj[index] = (Json::Value)cppArray[index];
+    return arrayObj;
+}
 
 // @#{Non-blocking RPC with callback}@#
 #ifdef PROVIDER_DEMO_INSIDE
@@ -124,6 +139,10 @@ bool ReturnRecived(std::string JSON)
                 break;
             case Json::ValueType::realValue:
                 (*(void(*)(float))(cbfptr))(root["return"].asFloat());
+                break;
+            case Json::ValueType::objectValue:
+                break;
+            case Json::ValueType::arrayValue:
                 break;
         }
         return true;

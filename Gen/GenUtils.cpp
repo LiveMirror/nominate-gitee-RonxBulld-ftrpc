@@ -132,3 +132,16 @@ void substring_replace(std::string &str,const std::string &oldstr,const std::str
         pos+=b;
     }
 }
+
+/**
+ * 对字符串中的自定义转义 $t 进行处理
+ * @param original
+ * @param level
+ * @return
+ */
+const std::string applyTabLevel(const std::string &original, unsigned int level) {
+    std::string proced = original;
+    const std::string tabFormat(level, '\t');
+    substring_replace(proced, "$t", tabFormat);
+    return proced;
+}

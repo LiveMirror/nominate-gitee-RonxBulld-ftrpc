@@ -24,5 +24,6 @@ std::string ReadFileAsTxt(std::string &path);
 std::string ReadTemplate(const std::string &path);
 void substring_replace(std::string &str,const std::string &oldstr,const std::string &newstr);
 bool isBaseType(enum Type T);
+const std::string applyTabLevel(const std::string &original, unsigned int level);
 
 #endif //FTRPC_GENUTILS_H

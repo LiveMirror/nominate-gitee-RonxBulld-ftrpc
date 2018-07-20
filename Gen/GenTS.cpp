@@ -86,14 +86,13 @@ bool GenerateTypeScript_Caller(std::unique_ptr<RootNode> &document, TokenManage 
         ModuleDefine.append("}\n\n");
     }
     substring_replace(CallerTplFile, "// #@{Non-blocking RPC with callback}@#", ModuleDefine);
-    static const char *HeadText = "/*\n"
-                                  " * Auto generate by ftrpc\n"
-                                  " * Created by Rexfield on 2018/5/2\n"
-                                  " * Warning: Please do not modify any code unless you know what you are doing.\n"
-                                  " */";
     FILE *pCallerSrcFile = fopen(ts_file_name, "w+");
-    fputs(HeadText, pCallerSrcFile);
-    fputs(CallerTplFile.c_str(), pCallerSrcFile);
+#define NOTIFICATION(s) " * " s "\n"
+    fprintf(pCallerSrcFile, "/*\n"
+#include "../Notification.txt"
+                            " */"
+                            "%s", CallerTplFile.c_str());
+#undef NOTIFICATION
     fclose(pCallerSrcFile);
 }
 
