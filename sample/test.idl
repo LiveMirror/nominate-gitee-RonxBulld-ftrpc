@@ -10,7 +10,13 @@ module Test:
     };
 	void request(string[] req, int tz, bool flag);
 	Custom sss(Custom p, Custom q);
-	string[] requireNewStockInfo();
+	struct NewInfo:
+	{
+	    string name;
+	    string code;
+	    int limit;
+	};
+	NewInfo[] requireNewStockInfo();
 	struct NewStruct:
 	{
 	    int c;

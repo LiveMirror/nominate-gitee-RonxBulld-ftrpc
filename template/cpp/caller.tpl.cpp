@@ -19,13 +19,19 @@ unsigned int GlobalSerialIndex = 0;
                std::ostringstream os; \
                writer->write(ret, &os); \
                return os.str(); }while(0)
-
+#define FAILED(RESULT) do{ throw std::runtime_error(RESULT); \
+                       return false; }while(0)
 #define BUILD_JSON_HEAD(jv, FuncName) do{ jv["type"] = "rpc"; \
                                       jv["serial"] = serial; \
                                       jv["funcName"] = FuncName; } while(0)
 
 std::map<unsigned int, void *> serialCallbackMap;
 std::mutex scmapMutex;
+
+constexpr unsigned long long int HashStringToInt(const char *str, unsigned long long int hash = 0)
+{
+    return (*str == 0) ? hash : 101 * HashStringToInt(str + 1) + *str;
+}
 
 class JsonValueExtra : public Json::Value
 {
@@ -50,6 +56,15 @@ public:
     }
 #endif
     JsonValueExtra(const Json::Value &jvalue) : Json::Value(jvalue) { }
+    bool isJsonArray(bool (JsonValueExtra::*method)()) {
+        if (!this->isArray()) { return false; }
+        for (int index = 0; index < this->size(); index++) {
+            if (!(static_cast<JsonValueExtra>(this->operator[](index)).*method)()) {
+                return false;
+            }
+        }
+        return true;
+    }
     bool isJsonArray(bool (JsonValueExtra::*method)() const) {
         if (!this->isArray()) { return false; }
         for (int index = 0; index < this->size(); index++) {
@@ -59,10 +74,10 @@ public:
         }
         return true;
     }
-    template <class T> std::vector<T> asJsonArray(T (JsonValueExtra::*method)() const) {
+    template <class T> std::vector<T> asJsonArray(T (JsonValueExtra::*method)()) {
         std::vector<T> cppArray;
         for (int index = 0; index < this->size(); index++) {
-            cppArray.push_back((this->operator[](index).*method)());
+            cppArray.push_back((((JsonValueExtra)this->operator[](index)).*method)());
         }
         return cppArray;
     }
@@ -117,33 +132,17 @@ bool ReturnRecived(std::string JSON)
             return false;
         }
         unsigned int serial = root["serial"].asUInt();
+        std::string funcName = root["funcName"].asString();
         scmapMutex.lock();
         void *cbfptr = serialCallbackMap[serial];
         serialCallbackMap.erase(serial);
         scmapMutex.unlock();
         if (!root["success"].asBool())
             return false;
-        switch (root["return"].type())
+        // The parameter signature verifies and executes the call.
+        switch (HashStringToInt(funcName.c_str()))
         {
-            case Json::ValueType::booleanValue:
-                (*(void(*)(bool))(cbfptr))(root["return"].asBool());
-                break;
-            case Json::ValueType::intValue:
-                (*(void(*)(int))(cbfptr))(root["return"].asInt());
-                break;
-            case Json::ValueType::nullValue:
-                (*(void(*)(void))(cbfptr))();
-                break;
-            case Json::ValueType::stringValue:
-                (*(void(*)(std::string))(cbfptr))(root["return"].asString());
-                break;
-            case Json::ValueType::realValue:
-                (*(void(*)(float))(cbfptr))(root["return"].asFloat());
-                break;
-            case Json::ValueType::objectValue:
-                break;
-            case Json::ValueType::arrayValue:
-                break;
+// #@{Callback Check and Call}@#
         }
         return true;
     } else {

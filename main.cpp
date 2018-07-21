@@ -24,7 +24,8 @@ void help() {
                     "--output|-o          Who will choose to generate.\n"
                     "--no-version-n|-n    No version infomation in output.\n"
                     "--builtin-json|-j    Use built-in json module with C++.\n"
-                    "\nCreated by Rexfield.\n"
+                    "\n"
+                    "Created by Rexfield.\n"
                     "Allow with GPLv3.\n"
                     "BUG report: https://gitee.com/RonxBulld/ftrpc/issues\n"
                     "\n");

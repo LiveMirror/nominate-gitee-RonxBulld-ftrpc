@@ -73,6 +73,15 @@ public:
 #endif
     JsonValueExtra() : Json::Value() { }
     JsonValueExtra(const Json::Value &jvalue) : Json::Value(jvalue) { }
+    bool isJsonArray(bool (JsonValueExtra::*method)()) {
+        if (!this->isArray()) { return false; }
+        for (int index = 0; index < this->size(); index++) {
+            if (!(static_cast<JsonValueExtra>(this->operator[](index)).*method)()) {
+                return false;
+            }
+        }
+        return true;
+    }
     bool isJsonArray(bool (JsonValueExtra::*method)() const) {
         if (!this->isArray()) { return false; }
         for (int index = 0; index < this->size(); index++) {
@@ -82,10 +91,10 @@ public:
         }
         return true;
     }
-    template <class T> const std::vector<T> asJsonArray(T (JsonValueExtra::*method)() const) {
+    template <class T> std::vector<T> asJsonArray(T (JsonValueExtra::*method)()) {
         std::vector<T> cppArray;
         for (int index = 0; index < this->size(); index++) {
-            cppArray.push_back((this->operator[](index).*method)());
+            cppArray.push_back((((JsonValueExtra)this->operator[](index)).*method)());
         }
         return cppArray;
     }
@@ -126,11 +135,15 @@ std::string ProviderDoCall(const std::string &JSON, void *extraOption)
         unsigned int serial = root["serial"].asUInt();
         ret["serial"] = serial;
         std::string funcName = root["funcName"].asString();
+        ret["funcName"] = root["funcName"];
         int paramCount = -1;
         Json::Value param = root["params"];
         if(param.isArray()) {
             paramCount = param.size();
+        } else {
+            paramCount = 0;
         }
+// #@{Framework Version}@#
         // The parameter signature verifies and executes the call.
         switch (HashStringToInt(funcName.c_str()))
         {

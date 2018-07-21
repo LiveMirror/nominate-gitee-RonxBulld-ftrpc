@@ -5,7 +5,7 @@
 #ifndef FTRPC_GENUTILS_H
 #define FTRPC_GENUTILS_H
 
-#define PROGRAM_VERSION_STR "2"
+#define PROGRAM_VERSION_STR "3"
 #include "../ast_tree.h"
 #include "../lex.h"
 #include "../symman.h"

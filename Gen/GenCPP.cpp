@@ -60,7 +60,8 @@ FILE *OpenHeadToWrite(const char *fn, const char *mode = "w+")
 void CloseHeadToWrite(FILE *fp, const char *fn)
 {
     std::string mdef = FilenameToMacro(fn);
-    fprintf(fp, "\n"
+    fprintf(fp, "bool ReturnRecived(std::string JSON);\n"
+                "\n"
                 "\n#endif // %s\n", mdef.c_str());
     // End generate
     fclose(fp);
@@ -222,12 +223,12 @@ bool GenerateCPP_ProviderCode(std::unique_ptr<RootNode> &document, TokenManage &
             for(auto &param : api.params) {
                 // Parament check
                 const std::string strParam = "param[" + std::to_string(paramIndex) + "]";
-                std::string CheckStat = "\t\t\t\tif (!(((JsonValueExtra*)(&{strParam}))->{JsonCheckMethod})) { FAILED(\"While call \\\"{FullApiName}\\\", arguments {paramIndex} type check error.\"); }\n";
-                substring_replace(CheckStat, "{strParam}", strParam);
-                substring_replace(CheckStat, "{JsonCheckMethod}", GetJsonCheckMethod(param.type));
-                substring_replace(CheckStat, "{FullApiName}", FullApiName);
-                substring_replace(CheckStat, "{paramIndex}", std::to_string(paramIndex));
-                FunctionCheckAndCall += CheckStat;
+                std::string ParamCheckStat = "\t\t\t\tif (!(((JsonValueExtra*)(&{strParam}))->{JsonCheckMethod})) { FAILED(\"While call \\\"{FullApiName}\\\", arguments {paramIndex} type check error.\"); }\n";
+                substring_replace(ParamCheckStat, "{strParam}", strParam);
+                substring_replace(ParamCheckStat, "{JsonCheckMethod}", GetJsonCheckMethod(param.type));
+                substring_replace(ParamCheckStat, "{FullApiName}", FullApiName);
+                substring_replace(ParamCheckStat, "{paramIndex}", std::to_string(paramIndex));
+                FunctionCheckAndCall += ParamCheckStat;
                 // Parament convert
                 UseParaments += "((JsonValueExtra*)(&" + strParam + "))->" + GetJsonConvertMethod(param.type) + ", ";
                 paramIndex++;
@@ -245,6 +246,11 @@ bool GenerateCPP_ProviderCode(std::unique_ptr<RootNode> &document, TokenManage &
     substring_replace(ProviderTplFile, "// #@{Custom struct convert method}@#", JsonExtern + "// #@{Custom struct convert method}@#\n");
     substring_replace(ProviderTplFile, "// #@{Function Check and Call}@#", FunctionCheckAndCall);
     substring_replace(ProviderTplFile, "// #@{FTRPC Provider Head File}@#", std::string("#include \"") + filename.substr(0, filename.length() - 3) + "h\"");
+    std::string VersionCheckAndSet = "\t\tret[\"framework_version\"] = " PROGRAM_VERSION_STR ";\n"
+                                     "\t\tret[\"version\"] = " + std::to_string(document->version) + ";\n";
+    VersionCheckAndSet += "\t\tif (!(root[\"framework_version\"].isInt() && root[\"framework_version\"].asInt() == " PROGRAM_VERSION_STR ")) "
+                          "{ FAILED(\"Bad Framework Version, require v" PROGRAM_VERSION_STR " \"); }\n";
+    substring_replace(ProviderTplFile, "// #@{Framework Version}@#", VersionCheckAndSet);
 
 #define NOTIFICATION(s) " * " s "\n"
     fprintf(pProviderSrcFile, "/*\n"
@@ -267,7 +273,7 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
 bool GenerateCPP_CallerHead(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem, const std::string &filename) {
     FILE *pCallerHeaderFile = OpenHeadToWrite(filename.c_str());
     fprintf(pCallerHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document->version);
-    fprintf(pCallerHeaderFile, "\n#include <string>\n\n");
+    fprintf(pCallerHeaderFile, "\n#include <string>\n#include <vector>\n\n");
     // Module
     for(auto &module : document->modules) {
         std::string CurModuleName = tokenSystem[module.name];
@@ -300,7 +306,7 @@ bool GenerateCPP_CallerHead(std::unique_ptr<RootNode> &document, TokenManage &to
 bool GenerateCPP_CallerCode(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem, const std::string &filename) {
     FILE *pCallerSrcFile = fopen(filename.c_str(), "w+");
     std::string CallerTplFile = ReadTemplate(CALLER_TPL_FILE);
-    std::string FunctionWithCallBack, JsonExtern;
+    std::string FunctionWithCallBack, JsonExtern, CallbackCheckAndCall;
 
     // Module
     for(auto &module : document->modules) {
@@ -317,14 +323,27 @@ bool GenerateCPP_CallerCode(std::unique_ptr<RootNode> &document, TokenManage &to
             FullApiName.append(CurModuleName).append("::").append(ApiName);
 
             FunctionWithCallBack.append("std::string ").append(FullApiName).append("(");
+            CallbackCheckAndCall += "\t\t\tcase HashStringToInt(\"" + FullApiName + "\"): {\n";
             // Params
             int paramIndex = 0;
             for(auto &param : api.params) {
+                const std::string strParam = "params[" + std::to_string(paramIndex) + "]";
                 std::string paramName = tokenSystem[param.name];
                 FunctionWithCallBack.append(GetCppType(param.type)).append(" ").append(paramName).append(", ");
-                FunctionParams += "\tparams[" + std::to_string(paramIndex) + "] = " + ForceConvert_CPP(param.type) + "(" + paramName + ");\n";
+                FunctionParams += "\t" + strParam + " = " + ForceConvert_CPP(param.type) + "(" + paramName + ");\n";
                 paramIndex++;
             }
+            std::string ReturnCheckStat = "\t\t\t\tif (!(((JsonValueExtra*)(&root[\"return\"]))->{JsonCheckMethod})) { FAILED(\"While \\\"{FullApiName}\\\" return, type check error.\"); }\n";
+            substring_replace(ReturnCheckStat, "{JsonCheckMethod}", GetJsonCheckMethod(api.retType));
+            substring_replace(ReturnCheckStat, "{FullApiName}", FullApiName);
+            CallbackCheckAndCall += ReturnCheckStat;
+            std::string CallbackParam;
+            if (api.retType.type != TY_void) {
+                CallbackParam = "((JsonValueExtra*)(&root[\"return\"]))->" + GetJsonConvertMethod(api.retType);
+            }
+            CallbackCheckAndCall += "\t\t\t\t(*(void(*)(" + GetCppType(api.retType) + "))(cbfptr))(" + CallbackParam + ");\n"
+                                    "\t\t\t\tbreak;\n"
+                                    "\t\t\t}\n";
             FunctionWithCallBack.append("void(*_callback)(");
             if (api.retType.type != TY_void) {
                 FunctionWithCallBack.append(GetCppType(api.retType));
@@ -337,6 +356,7 @@ bool GenerateCPP_CallerCode(std::unique_ptr<RootNode> &document, TokenManage &to
             FunctionWithCallBack.append(FunctionParams);
             FunctionWithCallBack.append("\tret[\"params\"] = params;\n"
                                         "\tret[\"version\"] = FTRPC_VERSION_MAJOR;\n"
+                                        "\tret[\"framework_version\"] = " PROGRAM_VERSION_STR ";\n"
                                         "\tscmapMutex.lock();\n"
                                         "\tserialCallbackMap[serial] = (void*)_callback;\n"
                                         "\tscmapMutex.unlock();\n"
@@ -345,8 +365,12 @@ bool GenerateCPP_CallerCode(std::unique_ptr<RootNode> &document, TokenManage &to
         }
     }
     substring_replace(CallerTplFile, "// @#{Non-blocking RPC with callback}@#", FunctionWithCallBack);
+    substring_replace(CallerTplFile, "// #@{Callback Check and Call}@#", CallbackCheckAndCall);
     substring_replace(CallerTplFile, "// #@{Custom struct convert method}@#", JsonExtern + "// #@{Custom struct convert method}@#\n");
     substring_replace(CallerTplFile, "// #@{FTRPC Caller Head File}@#", std::string("#include \"") + filename.substr(0, filename.length() - 3) + "h\"");
+    std::string VersionCheckAndSet = "\t\tif (!(root[\"framework_version\"].isInt() && root[\"framework_version\"].asInt() == " PROGRAM_VERSION_STR ")) "
+                                     "{ FAILED(\"Bad Framework Version, require v" PROGRAM_VERSION_STR " \"); }\n";
+    substring_replace(CallerTplFile, "// #@{Framework Version}@#", VersionCheckAndSet);
 
 #define NOTIFICATION(s) " * " s "\n"
     fprintf(pCallerSrcFile, "/*\n"
