@@ -364,7 +364,7 @@ bool GenerateCPP_CallerCode(std::unique_ptr<RootNode> &document, TokenManage &to
                                         "}\n\n");
         }
     }
-    substring_replace(CallerTplFile, "// @#{Non-blocking RPC with callback}@#", FunctionWithCallBack);
+    substring_replace(CallerTplFile, "// #@{Non-blocking RPC with callback}@#", FunctionWithCallBack);
     substring_replace(CallerTplFile, "// #@{Callback Check and Call}@#", CallbackCheckAndCall);
     substring_replace(CallerTplFile, "// #@{Custom struct convert method}@#", JsonExtern + "// #@{Custom struct convert method}@#\n");
     substring_replace(CallerTplFile, "// #@{FTRPC Caller Head File}@#", std::string("#include \"") + filename.substr(0, filename.length() - 3) + "h\"");

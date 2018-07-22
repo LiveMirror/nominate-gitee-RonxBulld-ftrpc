@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
         for (auto &structure : module.structs) {
             TokenID token = parser.typeManage.ty2tk[structure.type];
             std::string name = parser.tokenManage[token];
-            RegistType(structure.type, "is"+name+"Struct", "as"+name+"Struct", "struct "+module_name+"::"+name, name);
+            RegistType(structure.type, "is"+name+"Struct", "as"+name+"Struct", "struct "+module_name+"::"+name, module_name+"."+name);
         }
     }
 //    for (auto structure : parser.typeManage.StructsMap) {

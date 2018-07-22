@@ -97,7 +97,7 @@ template <class T> Json::Value CppArrayToJson(T && cppArray) {
     return arrayObj;
 }
 
-// @#{Non-blocking RPC with callback}@#
+// #@{Non-blocking RPC with callback}@#
 #ifdef PROVIDER_DEMO_INSIDE
 std::string Test::request(std::string req, void(*_callback)(void))
 {

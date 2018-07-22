@@ -18,6 +18,7 @@ bool RegistType(TypeID type, const std::string &JsonCheckMethod, const std::stri
 const std::string GetJsonCheckMethod(TypeNode T);
 const std::string GetJsonConvertMethod(TypeNode T);
 const std::string GetCppType(TypeNode T);
+const std::string GetTsTypeBase(TypeNode T);
 const std::string GetTsType(TypeNode T);
 std::string ReadFileAsTxt(const char *path);
 std::string ReadFileAsTxt(std::string &path);

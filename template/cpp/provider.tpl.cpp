@@ -128,7 +128,7 @@ std::string ProviderDoCall(const std::string &JSON, void *extraOption)
     {
         // Verify and get basic information.
         if (root["type"].asString() != "rpc")
-            FAILED("Note RPC");
+            FAILED("Not RPC");
         if (root["version"].asInt() != FTRPC_VERSION_MAJOR)
             FAILED("Version does not match.");
         ret["type"] = "rpcAnswer";

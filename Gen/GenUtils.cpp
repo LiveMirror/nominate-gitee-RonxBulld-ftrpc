@@ -57,11 +57,14 @@ const std::string GetCppType(TypeNode T) {
     else
         return "std::vector<" + typeMap[T.type][CppTypeName_Gen] + ">";
 }
+const std::string GetTsTypeBase(TypeNode T) {
+    return typeMap[T.type][TypescriptTypeName_Gen];
+}
 const std::string GetTsType(TypeNode T) {
     if (!T.isArray)
-        return typeMap[T.type][TypescriptTypeName_Gen];
+        return GetTsTypeBase(T);
     else
-        return "Array<" + typeMap[T.type][TypescriptTypeName_Gen] + ">";
+        return "Array<" + GetTsTypeBase(T) + ">";
 }
 
 bool isBaseType(enum Type T) {
