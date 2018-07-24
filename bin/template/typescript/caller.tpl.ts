@@ -1,36 +1,24 @@
 
 class rpcPack {
-    public type: string = "";
-    public version: number = 0;
-    public serial: number = -1;
+    // #@{FRAMEWORK_VERSION}@#
     public funcName: string = "";
     public params: any = null;
+    public serial: number = -1;
+    public type: string = "";
+    public version: number = 0;
 }
 
 class rpcResult {
-    public type: string = "";
+    // #@{FRAMEWORK_VERSION}@#
+    public funcName: string = "";
+    public return: any = null;
     public serial: number = -1;
     public success: boolean = false;
-    public return: any = null;
+    public type: string = "";
+    public version: number = 0;
 }
 
 // #@{Non-blocking RPC with callback}@#
-/* SED REMOVE
-export class Test {
-    public static request(req: string, _callback: () => void): string {
-        let thisSerial = ftrpc_caller.serial++;
-        let reqStruct: rpcPack = {
-            type: "rpc",
-            version: 1,
-            serial: thisSerial,
-            funcName: "request",
-            params: [],
-        };
-        ftrpc_caller.callbackMap_noret[thisSerial] = _callback;
-        return JSON.stringify(reqStruct);
-    }
-}
-!SED REMOVE*/
 export class ftrpc_caller {
     public static serial: number = 0;
     public static callbackMap = new Map<number,(data:any)=>void>();
@@ -42,6 +30,9 @@ export class ftrpc_caller {
             return false;
         } else if(ansStruct.success == false) {
             return false;
+        }
+        switch (ansStruct.funcName) {
+// #@{Verify Return Value And Call}@#
         }
         if(ansStruct.serial in ftrpc_caller.callbackMap_noret) {
             let ptr = ftrpc_caller.callbackMap_noret[ansStruct.serial];
@@ -57,4 +48,4 @@ export class ftrpc_caller {
             return false;
         }
     }
-};
+}

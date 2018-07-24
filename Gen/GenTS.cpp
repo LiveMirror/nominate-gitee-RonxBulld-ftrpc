@@ -143,7 +143,7 @@ bool GenerateTypeScript_Provider(std::unique_ptr<RootNode> &document, TokenManag
             std::string FullApiName, FunctionParams, ParamsCheck;
             FullApiName = CurModuleName + "::" + ApiName;
             // Params
-            ModuleDefine += "\texport function " + ApiName + "(";
+            ModuleDefine += "\texport async function " + ApiName + "(";
             int paramIndex = 0;
             for (auto & param : api.params) {
                 std::string paramName = tokenSystem[param.name];
@@ -173,17 +173,17 @@ bool GenerateTypeScript_Provider(std::unique_ptr<RootNode> &document, TokenManag
 
                 paramIndex++;
             }
-            ModuleDefine += ") { throw \"Function " + CurModuleName + "." + ApiName + " implementation is missing.\"; }\n";
+            ModuleDefine += "): Promise<" + GetTsType(api.retType) + "> { throw \"Function " + CurModuleName + "." + ApiName + " implementation is missing.\"; }\n";
             if (!api.params.empty()) {
                 FunctionParams.erase(FunctionParams.end() - 2, FunctionParams.end());
             }
-            VerifyParamAndCall += "\t\tcase \"" + FullApiName + "\":\n"
-                                  "\t\t\tif (paramCount != " + std::to_string(api.params.size()) + ") { return JSON.stringify(ret); }\n"
+            VerifyParamAndCall += "\t\t\tcase \"" + FullApiName + "\":\n"
+                                  "\t\t\t\tif (paramCount != " + std::to_string(api.params.size()) + ") { return JSON.stringify(ret); }\n"
                                   + ParamsCheck;
             if (api.retType.type != TY_void) {
-                VerifyParamAndCall += "\t\t\tret[\"return\"] = ";
+                VerifyParamAndCall += "\t\t\t\tret[\"return\"] = ";
             } else {
-                VerifyParamAndCall += "\t\t\t";
+                VerifyParamAndCall += "\t\t\t\t";
             }
             VerifyParamAndCall += CurModuleName + "." + ApiName + "(";
             for (int i = 0; i < api.params.size(); i++) {
@@ -191,12 +191,13 @@ bool GenerateTypeScript_Provider(std::unique_ptr<RootNode> &document, TokenManag
                 if (i != api.params.size() - 1) { VerifyParamAndCall += ", "; }
             }
             VerifyParamAndCall += ");\n"
-                                  "\t\t\tbreak;\n";
+                                  "\t\t\t\tbreak;\n";
         }
         ModuleDefine += "}";
     }
     substring_replace(ProviderTplFile, "// #@{Provider Classes}@#", ModuleDefine);
-    substring_replace(ProviderTplFile, "// #@{FRAMEWORK_VERSION}@#", "ret[\"framework_version\"] = " PROGRAM_VERSION_STR ";");
+    substring_replace(ProviderTplFile, "// #@{FRAMEWORK_VERSION}@#", "public framework_version : number = " PROGRAM_VERSION_STR ";");
+    substring_replace(ProviderTplFile, "// #@{Set Framework Version}@#", "ret[\"framework_version\"] = " PROGRAM_VERSION_STR ";");
     substring_replace(ProviderTplFile, "// #@{Function Check and Call}@#", VerifyParamAndCall);
     FILE *pProviderSrcFile = fopen(ts_file_name, "w+");
 #define NOTIFICATION(s) " * " s "\n"
