@@ -60,8 +60,7 @@ FILE *OpenHeadToWrite(const char *fn, const char *mode = "w+")
 void CloseHeadToWrite(FILE *fp, const char *fn)
 {
     std::string mdef = FilenameToMacro(fn);
-    fprintf(fp, "bool ReturnRecived(std::string JSON);\n"
-                "\n"
+    fprintf(fp, "\n"
                 "\n#endif // %s\n", mdef.c_str());
     // End generate
     fclose(fp);
@@ -273,7 +272,8 @@ bool GenerateCPP_Provider(std::unique_ptr<RootNode> &document, TokenManage &toke
 bool GenerateCPP_CallerHead(std::unique_ptr<RootNode> &document, TokenManage &tokenSystem, TypeManage &typeSystem, const std::string &filename) {
     FILE *pCallerHeaderFile = OpenHeadToWrite(filename.c_str());
     fprintf(pCallerHeaderFile, "#define FTRPC_VERSION_MAJOR %d\n\n", document->version);
-    fprintf(pCallerHeaderFile, "\n#include <string>\n#include <vector>\n\n");
+    fprintf(pCallerHeaderFile, "\n#include <string>\n#include <vector>\n\n"
+                               "bool ReturnRecived(std::string JSON, void *extraOption = nullptr);\n\n");
     // Module
     for(auto &module : document->modules) {
         std::string CurModuleName = tokenSystem[module.name];
@@ -296,7 +296,7 @@ bool GenerateCPP_CallerHead(std::unique_ptr<RootNode> &document, TokenManage &to
                 std::string paramName = tokenSystem[param.name];
                 fprintf(pCallerHeaderFile, "%s %s, ", GetCppType(param.type).c_str(), paramName.c_str());
             }
-            fprintf(pCallerHeaderFile, "void(*_callback)(%s));\n", GetCppType(api.retType).c_str());
+            fprintf(pCallerHeaderFile, "void(*_callback)(%s, void *extraOption));\n", GetCppType(api.retType).c_str());
         }
         fprintf(pCallerHeaderFile, "};");
     }
@@ -339,16 +339,16 @@ bool GenerateCPP_CallerCode(std::unique_ptr<RootNode> &document, TokenManage &to
             CallbackCheckAndCall += ReturnCheckStat;
             std::string CallbackParam;
             if (api.retType.type != TY_void) {
-                CallbackParam = "((JsonValueExtra*)(&root[\"return\"]))->" + GetJsonConvertMethod(api.retType);
+                CallbackParam = "((JsonValueExtra*)(&root[\"return\"]))->" + GetJsonConvertMethod(api.retType) + ", ";
             }
-            CallbackCheckAndCall += "\t\t\t\t(*(void(*)(" + GetCppType(api.retType) + "))(cbfptr))(" + CallbackParam + ");\n"
+            CallbackCheckAndCall += "\t\t\t\t(*(void(*)(" + GetCppType(api.retType) + "))(cbfptr))(" + CallbackParam + "extraOption);\n"
                                     "\t\t\t\tbreak;\n"
                                     "\t\t\t}\n";
-            FunctionWithCallBack.append("void(*_callback)(");
+            FunctionWithCallBack += "void(*_callback)(";
             if (api.retType.type != TY_void) {
-                FunctionWithCallBack.append(GetCppType(api.retType));
+                FunctionWithCallBack += GetCppType(api.retType) + ", ";
             }
-            FunctionWithCallBack.append("))\n{\n"
+            FunctionWithCallBack.append("void *extraOption))\n{\n"
                                         "\tJson::Value ret;\n"
                                         "\tunsigned int serial = GlobalSerialIndex++;\n"
                                         "\tBUILD_JSON_HEAD(ret, \"").append(FullApiName).append("\");\n");

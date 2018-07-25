@@ -115,7 +115,7 @@ std::string Test::request(std::string req, void(*_callback)(void))
 }
 #endif
 
-bool ReturnRecived(std::string JSON)
+bool ReturnRecived(std::string JSON, void *extraOption)
 {
     Json::CharReaderBuilder crb;
     std::unique_ptr<Json::CharReader> reader(crb.newCharReader());
