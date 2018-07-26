@@ -26,7 +26,7 @@ var rpcResult = /** @class */ (function () {
 // #@{Provider Classes}@#
 var ftrpc_provider;
 (function (ftrpc_provider) {
-    function ProviderDoCall(root) {
+    function ProviderDoCall(root, extraOption) {
         var ret = new rpcResult();
         ret["success"] = false;
         if (typeof root === "string") {

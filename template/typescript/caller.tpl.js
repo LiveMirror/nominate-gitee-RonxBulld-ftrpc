@@ -27,7 +27,7 @@ var rpcResult = /** @class */ (function () {
 var ftrpc_caller = /** @class */ (function () {
     function ftrpc_caller() {
     }
-    ftrpc_caller.ReturnRecived = function (answerJson) {
+    ftrpc_caller.ReturnRecived = function (answerJson, extraOption) {
         var ansStruct = JSON.parse(answerJson);
         if (ansStruct.type != "rpcAnswer") {
             return false;
@@ -41,13 +41,13 @@ var ftrpc_caller = /** @class */ (function () {
         if (ansStruct.serial in ftrpc_caller.callbackMap_noret) {
             var ptr = ftrpc_caller.callbackMap_noret[ansStruct.serial];
             ftrpc_caller.callbackMap_noret.delete(ansStruct.serial);
-            ptr();
+            ptr(extraOption);
             return true;
         }
         else if (ansStruct.serial in ftrpc_caller.callbackMap) {
             var ptr = ftrpc_caller.callbackMap[ansStruct.serial];
             ftrpc_caller.callbackMap.delete(ansStruct.serial);
-            ptr(ansStruct.return);
+            ptr(ansStruct.return, extraOption);
             return true;
         }
         else {

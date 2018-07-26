@@ -24,7 +24,7 @@ export class ftrpc_caller {
     public static callbackMap = new Map<number,(data:any)=>void>();
     public static callbackMap_noret = new Map<number, ()=>void>();
 
-    public static ReturnRecived(answerJson: string): boolean {
+    public static ReturnRecived(answerJson: string, extraOption?:any): boolean {
         let ansStruct: rpcResult = <rpcResult>JSON.parse(answerJson);
         if(ansStruct.type != "rpcAnswer") {
             return false;
@@ -37,12 +37,12 @@ export class ftrpc_caller {
         if(ansStruct.serial in ftrpc_caller.callbackMap_noret) {
             let ptr = ftrpc_caller.callbackMap_noret[ansStruct.serial];
             ftrpc_caller.callbackMap_noret.delete(ansStruct.serial);
-            ptr();
+            ptr(extraOption);
             return true;
         } else if (ansStruct.serial in ftrpc_caller.callbackMap) {
             let ptr = ftrpc_caller.callbackMap[ansStruct.serial];
             ftrpc_caller.callbackMap.delete(ansStruct.serial);
-            ptr(ansStruct.return);
+            ptr(ansStruct.return, extraOption);
             return true;
         } else {
             return false;

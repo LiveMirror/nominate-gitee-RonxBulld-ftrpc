@@ -20,7 +20,7 @@ class rpcResult {
 
 // #@{Provider Classes}@#
 export module ftrpc_provider {
-    export function ProviderDoCall(root: any): string {
+    export function ProviderDoCall(root: any, extraOption?:any): string {
         let ret = new rpcResult();
         ret["success"] = false;
         if (typeof root === "string") {

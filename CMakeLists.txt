@@ -14,6 +14,7 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
             )
     ADD_CUSTOM_COMMAND(OUTPUT auto_deploy
             COMMAND @copy .\\ftrpc.exe ..\\bin\\ftrpc.exe
+            COMMAND @xcopy $(CMAKE_SOURCE_DIR)\\template ..\\bin\\template /e/h/y/i
             )
 ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
     ADD_CUSTOM_COMMAND(OUTPUT copy_res
@@ -25,6 +26,7 @@ ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Linux")
             )
     ADD_CUSTOM_COMMAND(OUTPUT auto_deploy
             COMMAND copy ./ftrpc ../bin/ftrpc
+            COMMAND cp -a $(CMAKE_SOURCE_DIR)/template ../bin/template
             )
 ENDIF(CMAKE_SYSTEM_NAME MATCHES "Windows")
 add_custom_target(CopyTask ALL DEPENDS copy_res)

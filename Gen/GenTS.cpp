@@ -85,9 +85,9 @@ bool GenerateTypeScript_Caller(std::unique_ptr<RootNode> &document, TokenManage 
             }
             std::string ReternValue;
             if (api.retType.type != TY_void) {
-                ReternValue = "RetValue: "+ GetTsType(api.retType);
+                ReternValue = "RetValue: "+ GetTsType(api.retType) + ", ";
             }
-            ModuleDefine += "_callback: (" + ReternValue + ") => void): string {\n"
+            ModuleDefine += "_callback: (" + ReternValue + "extraOption?:any) => void): string {\n"
                             "\t\tlet thisSerial = ftrpc_caller.serial++;\n"
                             "\t\tlet reqStruct: rpcPack = {\n"
                             "\t\t\tframework_version: " PROGRAM_VERSION_STR ",\n"
@@ -140,16 +140,14 @@ bool GenerateTypeScript_Provider(std::unique_ptr<RootNode> &document, TokenManag
         int apiIndex = 0;
         for (auto & api : module.apis) {
             std::string ApiName = tokenSystem[api.name];
-            std::string FullApiName, FunctionParams, ParamsCheck;
+            std::string FullApiName, ParamsCheck;
             FullApiName = CurModuleName + "::" + ApiName;
             // Params
             ModuleDefine += "\texport async function " + ApiName + "(";
             int paramIndex = 0;
             for (auto & param : api.params) {
                 std::string paramName = tokenSystem[param.name];
-                ModuleDefine += paramName + ": " + GetTsType(param.type);
-                if (paramIndex != api.params.size() - 1) { ModuleDefine += ", "; }
-                FunctionParams += paramName + ", ";
+                ModuleDefine += paramName + ": " + GetTsType(param.type) + ", ";
 
                 std::string VerifyFmt, paramRefStr = "param[" + std::to_string(paramIndex) + "]";
                 if (param.type.type != TY_void) {
@@ -173,10 +171,7 @@ bool GenerateTypeScript_Provider(std::unique_ptr<RootNode> &document, TokenManag
 
                 paramIndex++;
             }
-            ModuleDefine += "): Promise<" + GetTsType(api.retType) + "> { throw \"Function " + CurModuleName + "." + ApiName + " implementation is missing.\"; }\n";
-            if (!api.params.empty()) {
-                FunctionParams.erase(FunctionParams.end() - 2, FunctionParams.end());
-            }
+            ModuleDefine += "extraOption?:any): Promise<" + GetTsType(api.retType) + "> { throw \"Function " + CurModuleName + "." + ApiName + " implementation is missing.\"; }\n";
             VerifyParamAndCall += "\t\t\tcase \"" + FullApiName + "\":\n"
                                   "\t\t\t\tif (paramCount != " + std::to_string(api.params.size()) + ") { return JSON.stringify(ret); }\n"
                                   + ParamsCheck;
@@ -187,10 +182,9 @@ bool GenerateTypeScript_Provider(std::unique_ptr<RootNode> &document, TokenManag
             }
             VerifyParamAndCall += CurModuleName + "." + ApiName + "(";
             for (int i = 0; i < api.params.size(); i++) {
-                VerifyParamAndCall += "param[" + std::to_string(i) + "]";
-                if (i != api.params.size() - 1) { VerifyParamAndCall += ", "; }
+                VerifyParamAndCall += "param[" + std::to_string(i) + "], ";
             }
-            VerifyParamAndCall += ");\n"
+            VerifyParamAndCall += "extraOption);\n"
                                   "\t\t\t\tbreak;\n";
         }
         ModuleDefine += "}";
