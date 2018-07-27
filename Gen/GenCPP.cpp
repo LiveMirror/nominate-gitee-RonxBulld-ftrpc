@@ -296,7 +296,11 @@ bool GenerateCPP_CallerHead(std::unique_ptr<RootNode> &document, TokenManage &to
                 std::string paramName = tokenSystem[param.name];
                 fprintf(pCallerHeaderFile, "%s %s, ", GetCppType(param.type).c_str(), paramName.c_str());
             }
-            fprintf(pCallerHeaderFile, "void(*_callback)(%s, void *extraOption));\n", GetCppType(api.retType).c_str());
+            fprintf(pCallerHeaderFile, "void(*_callback)(");
+            if (api.retType.type != TY_void) {
+                fprintf(pCallerHeaderFile, "%s, ", GetCppType(api.retType).c_str());
+            }
+            fprintf(pCallerHeaderFile, "void *extraOption));\n");
         }
         fprintf(pCallerHeaderFile, "};");
     }
@@ -341,7 +345,7 @@ bool GenerateCPP_CallerCode(std::unique_ptr<RootNode> &document, TokenManage &to
             if (api.retType.type != TY_void) {
                 CallbackParam = "((JsonValueExtra*)(&root[\"return\"]))->" + GetJsonConvertMethod(api.retType) + ", ";
             }
-            CallbackCheckAndCall += "\t\t\t\t(*(void(*)(" + GetCppType(api.retType) + "))(cbfptr))(" + CallbackParam + "extraOption);\n"
+            CallbackCheckAndCall += "\t\t\t\t(*(void(*)(" + (api.retType.type != TY_void ? GetCppType(api.retType) + ", " : "") + "void*))(cbfptr))(" + CallbackParam + "extraOption);\n"
                                     "\t\t\t\tbreak;\n"
                                     "\t\t\t}\n";
             FunctionWithCallBack += "void(*_callback)(";

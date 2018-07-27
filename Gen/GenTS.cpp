@@ -152,12 +152,12 @@ bool GenerateTypeScript_Provider(std::unique_ptr<RootNode> &document, TokenManag
                 std::string VerifyFmt, paramRefStr = "param[" + std::to_string(paramIndex) + "]";
                 if (param.type.type != TY_void) {
                     if (param.type.isArray) {
-                        VerifyFmt = "\t\t\tif (!(" + paramRefStr + " instanceof Array)) { return JSON.stringify(ret); }\n"
-                                    "\t\t\tfor (let item of " + paramRefStr + ") {\n"
-                                    "\t\t\t\t// #@{VerifyElement}@#\n"
-                                    "\t\t\t}\n";
+                        VerifyFmt = "\t\t\t\tif (!(" + paramRefStr + " instanceof Array)) { return JSON.stringify(ret); }\n"
+                                    "\t\t\t\tfor (let item of " + paramRefStr + ") {\n"
+                                    "\t\t\t\t\t// #@{VerifyElement}@#\n"
+                                    "\t\t\t\t}\n";
                     } else {
-                        VerifyFmt = "\t\t\t// #@{VerifyElement}@#\n";
+                        VerifyFmt = "\t\t\t\t// #@{VerifyElement}@#\n";
                     }
                     if (isBaseType(param.type.type)) {
                         substring_replace(VerifyFmt, "// #@{VerifyElement}@#", "if (!(typeof " + paramRefStr + " === \"" + GetTsTypeBase(param.type) + "\")) { return JSON.stringify(ret); }");
@@ -172,20 +172,20 @@ bool GenerateTypeScript_Provider(std::unique_ptr<RootNode> &document, TokenManag
                 paramIndex++;
             }
             ModuleDefine += "extraOption?:any): Promise<" + GetTsType(api.retType) + "> { throw \"Function " + CurModuleName + "." + ApiName + " implementation is missing.\"; }\n";
-            VerifyParamAndCall += "\t\t\tcase \"" + FullApiName + "\":\n"
-                                  "\t\t\t\tif (paramCount != " + std::to_string(api.params.size()) + ") { return JSON.stringify(ret); }\n"
+            VerifyParamAndCall += "\t\t\t\tcase \"" + FullApiName + "\":\n"
+                                  "\t\t\t\t\tif (paramCount != " + std::to_string(api.params.size()) + ") { return JSON.stringify(ret); }\n"
                                   + ParamsCheck;
             if (api.retType.type != TY_void) {
-                VerifyParamAndCall += "\t\t\t\tret[\"return\"] = ";
+                VerifyParamAndCall += "\t\t\t\t\tret[\"return\"] = ";
             } else {
-                VerifyParamAndCall += "\t\t\t\t";
+                VerifyParamAndCall += "\t\t\t\t\t";
             }
             VerifyParamAndCall += CurModuleName + "." + ApiName + "(";
             for (int i = 0; i < api.params.size(); i++) {
                 VerifyParamAndCall += "param[" + std::to_string(i) + "], ";
             }
             VerifyParamAndCall += "extraOption);\n"
-                                  "\t\t\t\tbreak;\n";
+                                  "\t\t\t\t\tbreak;\n";
         }
         ModuleDefine += "}";
     }
