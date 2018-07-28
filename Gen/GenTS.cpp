@@ -15,15 +15,44 @@
 #define CALLER_TPL_FILE "./template/typescript/caller.tpl.ts"
 
 
+std::string GenerateVerifyCode(TypeNode type, const std::string val, int tabLevel, const std::string WhileFalseReturn) {
+    std::string TabFormat(tabLevel, '\t');
+    std::string VerifyFmt;
+    if (type.type != TY_void) {
+        if (type.isArray) {
+            VerifyFmt = TabFormat + "if (!(" + val + " instanceof Array)) { return " + WhileFalseReturn + "; }\n" +
+                        TabFormat + "for (let item of " + val + ") {\n" +
+                        TabFormat + "\t// #@{VerifyElement}@#\n" +
+                        TabFormat + "}\n";
+        } else {
+            VerifyFmt = TabFormat + "// #@{VerifyElement}@#\n";
+        }
+        if (isBaseType(type.type)) {
+            substring_replace(VerifyFmt, "// #@{VerifyElement}@#", "if (!(typeof " + val + " === \"" + GetTsTypeBase(type) + "\")) { return " + WhileFalseReturn + "; }");
+        } else {
+            substring_replace(VerifyFmt, "// #@{VerifyElement}@#", "if (!(" + GetTsTypeBase(type) + ".verifyObject(" + val + "))) { return " + WhileFalseReturn + "; }");
+        }
+    } else {
+        VerifyFmt = TabFormat + "if (!(typeof " + val + " === \"undefined\")) { return " + WhileFalseReturn + "; }\n";
+    }
+    return VerifyFmt;
+}
+
 std::string GenerateTypeScript_StructDeclare(TypeID id, TokenManage &tokenSystem, TypeManage &typeSystem, unsigned int tabLevel = 0) {
     std::string TabFormat(tabLevel, '\t');
     auto &members = typeSystem.StructsMap[id];
     std::string Structure = TabFormat;
     std::string name = tokenSystem[typeSystem.ty2tk[id]];
     Structure += "export class " + name + " {\n";
+    std::string VerifyCode;
     for (const auto [type,token] : members) {
         Structure += TabFormat + "\t" + tokenSystem[token] + ": " + GetTsType(type) + ";\n";
+        VerifyCode += GenerateVerifyCode(type, "obj." + tokenSystem[token], tabLevel + 2, "false");
     }
+    Structure += TabFormat + "\tstatic verifyObject(obj: any): boolean {\n" +
+                 VerifyCode +
+                 TabFormat + "\t\treturn true;\n"
+                             "\t}\n";
     Structure += TabFormat + "}\n";
     return Structure;
 }
@@ -61,25 +90,8 @@ bool GenerateTypeScript_Caller(std::unique_ptr<RootNode> &document, TokenManage 
                 paramIndex++;
             }
             VerifyReturnAndCall += "\t\t\tcase \"" + FullApiName + "\":\n";
-            std::string VerifyFmt;
-            if (api.retType.type != TY_void) {
-                if (api.retType.isArray) {
-                    VerifyFmt = "\t\t\t\tif (!(ansStruct.return instanceof Array)) return false;\n"
-                                "\t\t\t\tfor (let item of ansStruct.return) {\n"
-                                "\t\t\t\t\t// #@{VerifyElement}@#\n"
-                                "\t\t\t\t}\n";
-                } else {
-                    VerifyFmt = "\t\t\t\t// #@{VerifyElement}@#\n";
-                }
-                if (isBaseType(api.retType.type)) {
-                    substring_replace(VerifyFmt, "// #@{VerifyElement}@#", "if (!(typeof ansStruct.return === \"" + GetTsTypeBase(api.retType) + "\")) return false;");
-                } else {
-                    substring_replace(VerifyFmt, "// #@{VerifyElement}@#", "if (!(ansStruct.return instanceof " + GetTsTypeBase(api.retType) + ")) return false;");
-                }
-            } else {
-                VerifyFmt = "\t\t\t\tif (!(typeof ansStruct.return === \"undefined\")) return false;\n";
-            }
-            VerifyReturnAndCall += VerifyFmt + "\t\t\t\tbreak;\n";
+            std::string VerifyCode = GenerateVerifyCode(api.retType, "ansStruct.return", 4, "false");
+            VerifyReturnAndCall += VerifyCode + "\t\t\t\tbreak;\n";
             if (!api.params.empty()) {
                 FunctionParams.erase(FunctionParams.end() - 2, FunctionParams.end());
             }
@@ -149,25 +161,9 @@ bool GenerateTypeScript_Provider(std::unique_ptr<RootNode> &document, TokenManag
                 std::string paramName = tokenSystem[param.name];
                 ModuleDefine += paramName + ": " + GetTsType(param.type) + ", ";
 
-                std::string VerifyFmt, paramRefStr = "param[" + std::to_string(paramIndex) + "]";
-                if (param.type.type != TY_void) {
-                    if (param.type.isArray) {
-                        VerifyFmt = "\t\t\t\tif (!(" + paramRefStr + " instanceof Array)) { return JSON.stringify(ret); }\n"
-                                    "\t\t\t\tfor (let item of " + paramRefStr + ") {\n"
-                                    "\t\t\t\t\t// #@{VerifyElement}@#\n"
-                                    "\t\t\t\t}\n";
-                    } else {
-                        VerifyFmt = "\t\t\t\t// #@{VerifyElement}@#\n";
-                    }
-                    if (isBaseType(param.type.type)) {
-                        substring_replace(VerifyFmt, "// #@{VerifyElement}@#", "if (!(typeof " + paramRefStr + " === \"" + GetTsTypeBase(param.type) + "\")) { return JSON.stringify(ret); }");
-                    } else {
-                        substring_replace(VerifyFmt, "// #@{VerifyElement}@#", "if (!(" + paramRefStr + " instanceof " + GetTsTypeBase(param.type) + ")) { return JSON.stringify(ret); }");
-                    }
-                } else {
-                    VerifyFmt = "\t\t\tif (!(typeof " + paramRefStr + " === \"undefined\")) { return JSON.stringify(ret); }\n";
-                }
-                ParamsCheck += VerifyFmt;
+                std::string paramRefStr = "param[" + std::to_string(paramIndex) + "]";
+                std::string VerifyCode = GenerateVerifyCode(param.type, paramRefStr, 4, "JSON.stringify(ret)");
+                ParamsCheck += VerifyCode;
 
                 paramIndex++;
             }
