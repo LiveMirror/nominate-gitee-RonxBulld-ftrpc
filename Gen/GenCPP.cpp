@@ -137,8 +137,8 @@ std::string GenerateCPP_StructCheckConvert(TypeID id, TokenManage &tokenSystem, 
     // Generate check code
     std::string code = "\tbool is" + name + "Struct() {\n";
     for (const auto & [type, token] : members) {
-        const std::string TOKEN = "this->operator[](\"" + tokenSystem[token] + "\")";
-        code += "\t\tif (!" + TOKEN + "." + GetJsonCheckMethod(type) + ") { return false; }\n";
+        const std::string TOKEN = "((JsonValueExtra*)&this->operator[](\"" + tokenSystem[token] + "\"))";
+        code += "\t\tif (!" + TOKEN + "->" + GetJsonCheckMethod(type) + ") { return false; }\n";
     }
     code += "\t\treturn true;\n"
             "\t}\n";
@@ -152,7 +152,7 @@ std::string GenerateCPP_StructCheckConvert(TypeID id, TokenManage &tokenSystem, 
     code += "\t\tstruct " + FullName + " " + tempValueName + ";\n";
     for (const auto & [type, token] : members) {
         const std::string & TOKEN = tokenSystem[token];
-        std::string memberAssignment = "\t\t#@{TemplateVariable}@#.#@{MemberName}@# = this->operator[](\"#@{MemberName}@#\").#@{ConvertMethod}@#;\n";
+        std::string memberAssignment = "\t\t#@{TemplateVariable}@#.#@{MemberName}@# = ((JsonValueExtra*)&this->operator[](\"#@{MemberName}@#\"))->#@{ConvertMethod}@#;\n";
         substring_replace(memberAssignment, "#@{TemplateVariable}@#", tempValueName);
         substring_replace(memberAssignment, "#@{MemberName}@#", TOKEN);
         substring_replace(memberAssignment, "#@{ConvertMethod}@#", GetJsonConvertMethod(type));

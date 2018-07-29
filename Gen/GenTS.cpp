@@ -15,7 +15,7 @@
 #define CALLER_TPL_FILE "./template/typescript/caller.tpl.ts"
 
 
-std::string GenerateVerifyCode(TypeNode type, const std::string val, int tabLevel, const std::string WhileFalseReturn) {
+std::string GenerateVerifyCode(TypeNode type, std::string val, int tabLevel, const std::string WhileFalseReturn) {
     std::string TabFormat(tabLevel, '\t');
     std::string VerifyFmt;
     if (type.type != TY_void) {
@@ -24,6 +24,7 @@ std::string GenerateVerifyCode(TypeNode type, const std::string val, int tabLeve
                         TabFormat + "for (let item of " + val + ") {\n" +
                         TabFormat + "\t// #@{VerifyElement}@#\n" +
                         TabFormat + "}\n";
+            val = "item";
         } else {
             VerifyFmt = TabFormat + "// #@{VerifyElement}@#\n";
         }
