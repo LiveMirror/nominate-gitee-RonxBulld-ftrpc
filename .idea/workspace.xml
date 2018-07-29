@@ -15,9 +15,9 @@
   <component name="ChangeListManager">
     <list default="true" id="7ba50d8e-82dc-41c6-8b11-b21400e89327" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Gen/GenCPP.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Gen/GenCPP.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Gen/GenTS.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Gen/GenTS.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bin/ftrpc.exe" beforeDir="false" afterPath="$PROJECT_DIR$/bin/ftrpc.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/parser.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/parser.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sample/test.idl" beforeDir="false" afterPath="$PROJECT_DIR$/sample/test.idl" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/cmake-build-release/" />
@@ -32,22 +32,23 @@
     <session id="1224131808">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="3" />
+          <entry key="project.closed" value="4" />
           <entry key="project.open.time.0" value="1" />
-          <entry key="project.open.time.1" value="1" />
+          <entry key="project.open.time.1" value="2" />
           <entry key="project.open.time.6" value="1" />
-          <entry key="project.opened" value="3" />
+          <entry key="project.opened" value="4" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.js.language.service.starts">
         <counts>
-          <entry key="TypeScriptServerServiceImpl" value="2" />
+          <entry key="TypeScriptServerServiceImpl" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="cpp" value="3" />
+          <entry key="cpp" value="5" />
           <entry key="h" value="1" />
+          <entry key="idl" value="1" />
           <entry key="js" value="1" />
           <entry key="ts" value="1" />
         </counts>
@@ -55,19 +56,22 @@
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="JavaScript" value="1" />
-          <entry key="ObjectiveC" value="4" />
+          <entry key="ObjectiveC" value="6" />
+          <entry key="PLAIN_TEXT" value="1" />
           <entry key="TypeScript" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="cpp" value="737" />
+          <entry key="cpp" value="759" />
+          <entry key="idl" value="80" />
           <entry key="ts" value="37" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="ObjectiveC" value="737" />
+          <entry key="ObjectiveC" value="759" />
+          <entry key="PLAIN_TEXT" value="80" />
           <entry key="TypeScript" value="37" />
         </counts>
       </usages-collector>
@@ -75,7 +79,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Gen/GenTS.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="306">
@@ -93,10 +97,28 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/parser.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="532">
+              <caret line="126" column="44" selection-start-line="126" selection-start-column="44" selection-end-line="126" selection-end-column="44" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lex.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="135">
+              <caret line="81" column="9" selection-start-line="81" selection-start-column="9" selection-end-line="81" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/template/typescript/provider.tpl.ts">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1254">
+            <state relative-caret-position="656">
               <caret line="66" column="1" selection-start-line="66" selection-start-column="1" selection-end-line="66" selection-end-column="1" />
             </state>
           </provider>
@@ -124,10 +146,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>serial</find>
-      <find>}@#</find>
-      <find>}#@</find>
-      <find>@#{</find>
       <find>reqStruct: rpcPack</find>
       <find>::</find>
       <find>FTRPC_VERSION_MAJOR</find>
@@ -154,6 +172,10 @@
       <find>isArray</find>
       <find>this-&gt;operator[](</find>
       <find>verifyObject</find>
+      <find>`]`</find>
+      <find>TOKEN_ID</find>
+      <find>getToken</find>
+      <find>T.value.c</find>
     </findStrings>
     <replaceStrings>
       <replace>#@{</replace>
@@ -172,10 +194,8 @@
         <option value="$PROJECT_DIR$/ast_tree.h" />
         <option value="$PROJECT_DIR$/symman.cpp" />
         <option value="$PROJECT_DIR$/symman.h" />
-        <option value="$PROJECT_DIR$/parser.cpp" />
         <option value="$PROJECT_DIR$/Notification.txt" />
         <option value="$PROJECT_DIR$/test/test.cpp" />
-        <option value="$PROJECT_DIR$/sample/test.idl" />
         <option value="$PROJECT_DIR$/cmake-build-debug/test.caller.cpp" />
         <option value="$PROJECT_DIR$/cmake-build-debug/test.provider.cpp" />
         <option value="$PROJECT_DIR$/test/provider.cpp" />
@@ -192,6 +212,8 @@
         <option value="$PROJECT_DIR$/cmake-build-debug/test.provider.ts" />
         <option value="$PROJECT_DIR$/Gen/GenCPP.cpp" />
         <option value="$PROJECT_DIR$/Gen/GenTS.cpp" />
+        <option value="$PROJECT_DIR$/sample/test.idl" />
+        <option value="$PROJECT_DIR$/parser.cpp" />
       </list>
     </option>
   </component>
@@ -219,11 +241,6 @@
             <path>
               <item name="ftrpc" type="b2602c69:ProjectViewProjectNode" />
               <item name="ftrpc" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ftrpc" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ftrpc" type="462c0819:PsiDirectoryNode" />
-              <item name="Gen" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="ftrpc" type="b2602c69:ProjectViewProjectNode" />
@@ -280,7 +297,7 @@
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Build All" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="test.idl -o c++,ts --no-version --builtin-json" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ftrpc" RUN_TARGET_NAME="ftrpc" EXPLICIT_BUILD_TARGET_NAME="all">
+    <configuration name="Build All" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="../../RPC/baseinfo.idl -o c++,ts --no-version --builtin-json" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="ftrpc" RUN_TARGET_NAME="ftrpc" EXPLICIT_BUILD_TARGET_NAME="all">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -336,23 +353,24 @@
       <workItem from="1532696214608" duration="34000" />
       <workItem from="1532750811436" duration="8526000" />
       <workItem from="1532847279176" duration="1609000" />
+      <workItem from="1532879150709" duration="1061000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="153193000" />
+    <option name="totallyTimeSpent" value="154254000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="2062" height="1126" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49697885" visible="true" weight="0.1511976" />
-      <window_info id="Structure" order="1" sideWeight="0.5030211" side_tool="true" visible="true" weight="0.1511976" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6257732" visible="true" weight="0.15269461" />
+      <window_info id="Structure" order="1" sideWeight="0.3742268" side_tool="true" visible="true" weight="0.15269461" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3285273" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.3285273" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.2298969" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.25979382" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -361,7 +379,7 @@
       <window_info anchor="bottom" id="Terminal" order="9" weight="0.32955715" />
       <window_info anchor="bottom" id="Version Control" order="10" />
       <window_info anchor="bottom" id="CMake" order="11" weight="0.3270525" />
-      <window_info active="true" anchor="bottom" id="Messages" order="12" visible="true" weight="0.31752577" />
+      <window_info anchor="bottom" id="Messages" order="12" weight="0.31752577" />
       <window_info anchor="bottom" id="Database Changes" order="13" show_stripe_button="false" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -389,13 +407,6 @@
     <entry file="file://$PROJECT_DIR$/cmake-build-debug/template/typescript/caller.tpl.ts" />
     <entry file="file://D:/DevCol/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/bits/basic_string.h" />
     <entry file="file://D:/DevCol/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/x86_64-w64-mingw32/include/stdio.h" />
-    <entry file="file://$PROJECT_DIR$/lex.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="105" column="48" lean-forward="true" selection-start-line="105" selection-start-column="48" selection-end-line="105" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lex.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="228">
@@ -426,13 +437,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/cmake-build-debug/test_.provider.cpp" />
-    <entry file="file://$PROJECT_DIR$/parser.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3268">
-          <caret line="172" column="5" selection-start-line="172" selection-start-column="5" selection-end-line="172" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://C:/Program Files/mingw-w64/x86_64-7.3.0-posix-seh-rt_v5-rev0/mingw64/lib/gcc/x86_64-w64-mingw32/7.3.0/include/c++/bits/basic_string.h" />
     <entry file="file://$PROJECT_DIR$/ast_tree.h">
       <provider selected="true" editor-type-id="text-editor">
@@ -478,13 +482,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/provider.cpp" />
-    <entry file="file://$PROJECT_DIR$/sample/test.idl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="17" column="6" selection-start-line="17" selection-start-column="6" selection-end-line="17" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/test/caller.cpp" />
     <entry file="file://$PROJECT_DIR$/Gen/GenUtils.h">
       <provider selected="true" editor-type-id="text-editor">
@@ -568,13 +565,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/template/typescript/provider.tpl.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1254">
-          <caret line="66" column="1" selection-start-line="66" selection-start-column="1" selection-end-line="66" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/template/typescript/caller.tpl.ts">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="836">
@@ -589,10 +579,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Gen/GenCPP.cpp">
+    <entry file="file://$PROJECT_DIR$/sample/test.idl">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="608">
-          <caret line="154" column="105" selection-start-line="154" selection-start-column="105" selection-end-line="154" selection-end-column="105" />
+        <state relative-caret-position="570">
+          <caret line="30" column="31" selection-start-line="30" selection-start-column="31" selection-end-line="30" selection-end-column="31" />
         </state>
       </provider>
     </entry>
@@ -600,6 +590,34 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="306">
           <caret line="26" column="25" selection-start-line="26" selection-start-column="25" selection-end-line="26" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/template/typescript/provider.tpl.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="656">
+          <caret line="66" column="1" selection-start-line="66" selection-start-column="1" selection-end-line="66" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Gen/GenCPP.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="608">
+          <caret line="154" column="105" selection-start-line="154" selection-start-column="105" selection-end-line="154" selection-end-column="105" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lex.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="81" column="9" selection-start-line="81" selection-start-column="9" selection-end-line="81" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/parser.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="532">
+          <caret line="126" column="44" selection-start-line="126" selection-start-column="44" selection-end-line="126" selection-end-column="44" />
         </state>
       </provider>
     </entry>

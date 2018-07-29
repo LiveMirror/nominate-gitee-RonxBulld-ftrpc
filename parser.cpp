@@ -122,7 +122,7 @@ std::unique_ptr<TypeNode> parse::parseType()
     }
     // Check if had array declare symbol
     SEE_NEXT_TOKEN(T);
-    if (T.value.c == '[') {
+    if (T.type == '[') {
         GETTOKEN(T);
         REQUIRE_TOKEN(T, ']', "Require `]`.");
         type->isArray = true;

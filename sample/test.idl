@@ -23,4 +23,10 @@ module Test:
 	    bool d;
 	};
 	NewStruct ns(string a);
+	struct someS:
+	{
+	    int a;
+	    string b;
+	};
+	someS[] compex(string stock, string date);
 };
