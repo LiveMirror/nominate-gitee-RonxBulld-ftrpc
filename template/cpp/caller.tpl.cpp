@@ -92,6 +92,7 @@ public:
 
 template <class T> Json::Value CppArrayToJson(T && cppArray) {
     Json::Value arrayObj;
+    arrayObj.resize(0);
     for (int index = 0; index < cppArray.size(); index++)
         arrayObj[index] = (Json::Value)cppArray[index];
     return arrayObj;
